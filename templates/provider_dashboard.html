@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Provider Dashboard - {{ provider.name }} | LOCALServe{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+  <!-- Provider Profile & Availability Switch Header -->
+  <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
+    <div class="row align-items-center g-3">
+      <div class="col-lg-8">
+        <div class="d-flex align-items-center gap-3">
+          <div class="service-icon-box m-0" style="width: 64px; height: 64px; font-size: 1.8rem;">
+            <i class="fa-solid {{ provider.icon or 'fa-wrench' }}"></i>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <h3 class="fw-bold mb-0 text-dark">{{ provider.name }}</h3>
+              {% if provider.verification_status == 'Verified' %}
+                <span class="provider-badge-verified"><i class="fa-solid fa-circle-check"></i> Verified</span>
+              {% else %}
+                <span class="provider-badge-pending"><i class="fa-solid fa-clock"></i> Verification Pending</span>
+              {% endif %}
+            </div>
+            <div class="text-muted small">
+              {{ provider.category }} &bull; ₹{{ provider.charges_per_hr }}/hr &bull; {{ provider.phone }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Availability Toggle -->
+      <div class="col-lg-4 text-lg-end">
+        <form action="{{ url_for('provider.toggle_availability') }}" method="POST" class="d-inline-flex align-items-center gap-2">
+          <span class="small fw-bold text-muted">Availability:</span>
+          <select name="availability" class="form-select form-select-sm w-auto fw-bold" onchange="this.form.submit()">
+            <option value="Available" {% if provider.availability == 'Available' %}selected{% endif %}>🟢 Available</option>
+            <option value="Busy" {% if provider.availability == 'Busy' %}selected{% endif %}>🟡 Busy / On Job</option>
+            <option value="Offline" {% if provider.availability == 'Offline' %}selected{% endif %}>⚪ Offline</option>
+          </select>
+        </form>
+      </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-3 mt-3 pt-3 border-top text-center">
+      <div class="col-3">
+        <div class="p-2 border rounded-3 bg-light">
+          <div class="text-muted small">Rating</div>
+          <h5 class="fw-bold text-warning mb-0"><i class="fa-solid fa-star"></i> {{ stats.rating }} ({{ stats.rating_count }})</h5>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="p-2 border rounded-3 bg-light">
+          <div class="text-muted small">Active Jobs</div>
+          <h5 class="fw-bold text-primary mb-0">{{ stats.total_active }}</h5>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="p-2 border rounded-3 bg-light">
+          <div class="text-muted small">Completed</div>
+          <h5 class="fw-bold text-success mb-0">{{ stats.total_completed }}</h5>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="p-2 border rounded-3 bg-light">
+          <div class="text-muted small">New Requests</div>
+          <h5 class="fw-bold text-danger mb-0">{{ stats.total_pending }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. INCOMING PENDING REQUESTS -->
+  <div class="mb-5">
+    <h4 class="fw-bold text-danger mb-3">
+      <i class="fa-solid fa-bell me-2"></i> Incoming Booking Requests ({{ pending_bookings|length }})
+    </h4>
+    {% if pending_bookings %}
+      <div class="row g-3">
+        {% for b in pending_bookings %}
+        <div class="col-lg-6">
+          <div class="bg-white p-4 rounded-4 shadow-sm border border-danger">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-danger">New Request #{{ b.booking_id }}</span>
+              <span class="text-muted small">{{ b.created_at|timeago }}</span>
+            </div>
+
+            <h5 class="fw-bold text-dark mb-1">{{ b.customer_name }}</h5>
+            <div class="small text-muted mb-2">
+              <i class="fa-solid fa-phone me-1"></i> <a href="tel:{{ b.customer_phone }}">{{ b.customer_phone }}</a>
+            </div>
+
+            <div class="bg-light p-3 rounded-3 small mb-3">
+              <div class="mb-1"><b>Problem:</b> {{ b.description }}</div>
+              <div class="mb-1"><b>Date & Time:</b> {{ b.booking_date }} ({{ b.booking_time }})</div>
+              <div><b>Address:</b> {{ b.address }}</div>
+            </div>
+
+            <form action="{{ url_for('provider.respond_booking', booking_id=b.booking_id) }}" method="POST" class="d-flex gap-2">
+              <button type="submit" name="action" value="accept" class="btn btn-success fw-bold flex-grow-1">
+                <i class="fa-solid fa-check me-1"></i> Accept Booking
+              </button>
+              <button type="submit" name="action" value="reject" class="btn btn-outline-danger fw-bold">
+                <i class="fa-solid fa-xmark me-1"></i> Decline
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="bg-white p-4 rounded-4 border text-center text-muted small">
+        <i class="fa-solid fa-inbox fs-3 mb-2 d-block text-secondary"></i>
+        No pending booking requests right now.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- 2. ACTIVE ONGOING JOBS -->
+  <div class="mb-5">
+    <h4 class="fw-bold text-primary mb-3">
+      <i class="fa-solid fa-business-time me-2"></i> Active Ongoing Jobs ({{ active_bookings|length }})
+    </h4>
+    {% if active_bookings %}
+      <div class="row g-3">
+        {% for b in active_bookings %}
+        <div class="col-lg-6">
+          <div class="bg-white p-4 rounded-4 shadow-sm border border-primary">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-primary">Job #{{ b.booking_id }}</span>
+              <span class="badge bg-warning text-dark">{{ b.status }}</span>
+            </div>
+
+            <h5 class="fw-bold text-dark mb-1">{{ b.customer_name }}</h5>
+            
+            <div class="d-flex gap-2 mb-3">
+              <a href="tel:{{ b.customer_phone }}" class="btn btn-sm btn-success fw-bold">
+                <i class="fa-solid fa-phone me-1"></i> Call Customer ({{ b.customer_phone }})
+              </a>
+              <a href="https://wa.me/{{ b.customer_phone|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-whatsapp">
+                <i class="fa-brands fa-whatsapp"></i>
+              </a>
+            </div>
+
+            <div class="bg-light p-3 rounded-3 small mb-3">
+              <div class="mb-1"><b>Problem:</b> {{ b.description }}</div>
+              <div><b>Address:</b> {{ b.address }}</div>
+            </div>
+
+            <!-- Job Lifecycle Status Updater -->
+            <form action="{{ url_for('provider.update_status', booking_id=b.booking_id) }}" method="POST" class="d-flex align-items-center gap-2">
+              <span class="small fw-bold text-muted text-nowrap">Update Stage:</span>
+              <select name="status" class="form-select form-select-sm fw-bold">
+                <option value="Accepted" {% if b.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+                <option value="Provider Assigned" {% if b.status == 'Provider Assigned' %}selected{% endif %}>Provider Assigned</option>
+                <option value="On the Way" {% if b.status == 'On the Way' %}selected{% endif %}>🛵 On the Way</option>
+                <option value="Service Started" {% if b.status == 'Service Started' %}selected{% endif %}>🔧 Service Started</option>
+                <option value="Completed" {% if b.status == 'Completed' %}selected{% endif %}>✅ Work Completed</option>
+              </select>
+              <button type="submit" class="btn btn-sm btn-primary fw-bold text-nowrap">Update</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="bg-white p-4 rounded-4 border text-center text-muted small">
+        No active ongoing jobs right now.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- 3. REVIEWS & RATINGS HISTORY -->
+  <div>
+    <h4 class="fw-bold text-dark mb-3">
+      <i class="fa-solid fa-star text-warning me-2"></i> Customer Feedback & Reviews
+    </h4>
+    <div class="bg-white p-4 rounded-4 shadow-sm border">
+      {% if reviews %}
+        <div class="list-group list-group-flush">
+          {% for r in reviews %}
+          <div class="list-group-item px-0 py-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="fw-bold text-dark">{{ r.reviewer_name }}</span>
+              <span class="text-warning">{% for i in range(r.rating) %}★{% endfor %}</span>
+            </div>
+            <p class="text-muted small mb-1">{{ r.comment }}</p>
+            <div class="text-muted" style="font-size: 0.75rem;">Job Date: {{ r.booking_date }} &bull; {{ r.created_at|timeago }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted small mb-0 text-center">No reviews yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

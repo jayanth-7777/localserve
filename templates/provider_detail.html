@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ provider.name }} - {{ provider.category }} | LOCALServe{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('customer.index') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('customer.services_list') }}">Services</a></li>
+      <li class="breadcrumb-item active">{{ provider.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Provider Info Column -->
+    <div class="col-lg-7">
+      <div class="bg-white p-4 rounded-4 shadow-sm border mb-4"
+           data-speech-en="{{ provider.name }}, {{ provider.category }}. Charges {{ provider.charges_per_hr }} rupees per hour. Rating {{ provider.rating }} stars with {{ provider.rating_count }} reviews. Address: {{ provider.address }}. You can call directly using the green button."
+           data-speech-te="{{ provider.name }}, {{ provider.category }} పనులు. గంటకు {{ provider.charges_per_hr }} రూపాయలు. రేటింగ్ {{ provider.rating }} స్టార్స్. మాట్లాడేందుకు ఆకుపచ్చ ఫోన్ బటన్ నొక్కండి.">
+        
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <span class="provider-badge-verified">
+            <i class="fa-solid fa-circle-check"></i> Verified Community Professional
+          </span>
+          <button class="btn btn-sm btn-speaker" onclick="readCardAloud(this)" title="Read aloud">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div class="service-icon-box m-0" style="width: 72px; height: 72px; font-size: 2rem;">
+            <i class="fa-solid {{ provider.icon or 'fa-wrench' }}"></i>
+          </div>
+          <div>
+            <h3 class="fw-bold mb-1">{{ provider.name }}</h3>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span class="badge bg-primary fs-6">{{ provider.category }}</span>
+              <span class="text-warning fw-bold fs-6">
+                <i class="fa-solid fa-star"></i> {{ provider.rating }} ({{ provider.rating_count }} reviews)
+              </span>
+              <span class="distance-badge">
+                <i class="fa-solid fa-location-dot text-danger"></i> {{ provider.distance }} km away
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1-Tap Direct Call & WhatsApp (Essential for low-literacy users) -->
+        <div class="p-3 bg-light rounded-3 mb-4 border">
+          <div class="small fw-bold text-muted mb-2 text-uppercase">Direct Instant Contact (నేరుగా మాట్లాడండి):</div>
+          <div class="d-flex gap-3 flex-wrap">
+            <a href="tel:{{ provider.phone }}" class="btn btn-lg btn-success flex-grow-1 fw-bold d-flex align-items-center justify-content-center gap-2">
+              <i class="fa-solid fa-phone fs-4"></i> Call {{ provider.phone }}
+            </a>
+            <a href="https://wa.me/{{ provider.phone|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-lg btn-whatsapp fw-bold d-flex align-items-center justify-content-center gap-2 px-4">
+              <i class="fa-brands fa-whatsapp fs-4"></i> WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <h5 class="fw-bold mb-2">About & Services Provided</h5>
+        <p class="text-muted mb-4">{{ provider.bio }}</p>
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-4">
+            <div class="border p-3 rounded-3 text-center bg-light">
+              <div class="text-muted small">Hourly Charge</div>
+              <h4 class="fw-bold text-success mb-0">₹{{ provider.charges_per_hr }}</h4>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="border p-3 rounded-3 text-center bg-light">
+              <div class="text-muted small">Experience</div>
+              <h4 class="fw-bold text-primary mb-0">{{ provider.experience_years }} Years</h4>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="border p-3 rounded-3 text-center bg-light">
+              <div class="text-muted small">Availability</div>
+              <h4 class="fw-bold text-info mb-0">{{ provider.availability }}</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-muted small">
+          <i class="fa-solid fa-location-dot text-danger me-1"></i> <b>Service Base:</b> {{ provider.address }}
+        </div>
+      </div>
+
+      <!-- Customer Reviews Section -->
+      <div class="bg-white p-4 rounded-4 shadow-sm border">
+        <h5 class="fw-bold mb-3">
+          <i class="fa-solid fa-star text-warning me-2"></i> Verified Customer Reviews ({{ reviews|length }})
+        </h5>
+        {% if reviews %}
+          <div class="list-group list-group-flush">
+            {% for r in reviews %}
+            <div class="list-group-item px-0 py-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="fw-bold text-dark"><i class="fa-solid fa-user-circle text-secondary me-1"></i> {{ r.reviewer_name }}</span>
+                <span class="text-warning">
+                  {% for i in range(r.rating) %}★{% endfor %}
+                </span>
+              </div>
+              <p class="text-muted mb-1 small">{{ r.comment }}</p>
+              <div class="text-muted" style="font-size: 0.75rem;">{{ r.created_at|timeago }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted small mb-0">No reviews yet. Be the first to book and review this service provider!</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Booking Form Column -->
+    <div class="col-lg-5">
+      <div class="bg-white p-4 rounded-4 shadow-sm border sticky-top" style="top: 80px;">
+        <h4 class="fw-bold text-primary mb-2">
+          <i class="fa-solid fa-calendar-check me-2"></i> Request Service Booking
+        </h4>
+        <p class="text-muted small mb-3">
+          Submit details below. The provider will review and accept your visit.
+        </p>
+
+        {% if not session.get('user_id') %}
+          <div class="alert alert-warning small mb-3">
+            <i class="fa-solid fa-circle-exclamation me-1"></i>
+            Please <a href="{{ url_for('auth.login', next=request.url) }}" class="fw-bold">Login</a> or use
+            <a href="{{ url_for('auth.quick_login', role='customer') }}" class="fw-bold">1-Click Customer Demo</a> to book.
+          </div>
+        {% endif %}
+
+        <form action="{{ url_for('customer.book_service', provider_id=provider.provider_id) }}" method="POST">
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Preferred Date</label>
+            <input type="date" class="form-control" name="booking_date" required id="bookingDateInput">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Time Slot</label>
+            <select class="form-select" name="booking_time">
+              <option value="Morning (8:00 AM - 12:00 PM)">Morning (8:00 AM - 12:00 PM)</option>
+              <option value="Afternoon (12:00 PM - 4:00 PM)">Afternoon (12:00 PM - 4:00 PM)</option>
+              <option value="Evening (4:00 PM - 8:00 PM)">Evening (4:00 PM - 8:00 PM)</option>
+              <option value="Urgent / Immediate">Urgent / Immediate</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Describe the problem</label>
+            <textarea class="form-control" name="description" rows="3" required
+                      placeholder="e.g. Switchboard sparking, water motor not starting, pipe leak..."></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Your Name</label>
+            <input type="text" class="form-control" name="customer_name"
+                   value="{{ session.get('user_name', '') }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Your Phone Number</label>
+            <input type="tel" class="form-control" name="customer_phone"
+                   value="{{ session.get('user_phone', '') }}" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold small">Your Village / Landmark / Address</label>
+            <textarea class="form-control" name="address" rows="2" required
+                      placeholder="House No, Village, Near Temple/Water Tank..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
+            <i class="fa-solid fa-paper-plane me-1"></i> Send Booking Request
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set default booking date to today
+    const dateInput = document.getElementById('bookingDateInput');
+    if (dateInput) {
+      dateInput.value = new Date().toISOString().split('T')[0];
+    }
+  });
+</script>
+{% endblock %}

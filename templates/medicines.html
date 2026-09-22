@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Medicine Availability Finder - LOCALServe{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Header with Voice Search -->
+  <div class="bg-white p-3 p-md-4 rounded-4 shadow-sm border mb-4">
+    <div class="row align-items-center g-3">
+      <div class="col-lg-6">
+        <h3 class="fw-bold mb-1 text-success">
+          <i class="fa-solid fa-prescription-bottle-medical me-2"></i> Local Medicine Availability Finder
+        </h3>
+        <p class="text-muted small mb-0">
+          <b>Pharmacy-reported availability</b> with last-updated timestamps from verified nearby medical stores.
+        </p>
+      </div>
+
+      <!-- Search & Voice Mic -->
+      <div class="col-lg-6">
+        <form action="{{ url_for('customer.medicines_list') }}" method="GET" id="medSearchForm" class="d-flex align-items-center gap-2">
+          <input type="hidden" name="category" value="{{ selected_category }}">
+          <input type="hidden" name="lat" value="{{ user_lat }}">
+          <input type="hidden" name="lng" value="{{ user_lng }}">
+
+          <button type="button" class="btn-mic" onclick="startVoiceSearch('medSearchInput', 'medSearchForm')" title="Tap and speak medicine name in Telugu, Hindi or English">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          
+          <input type="text" class="form-control" id="medSearchInput" name="q" value="{{ search_query }}"
+                 placeholder="Search medicine e.g. Paracetamol, ORS, Cetirizine..." data-i18n="search_placeholder_medicine">
+
+          <button type="submit" class="btn btn-success fw-bold px-3">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Category Filter Pills -->
+    <div class="d-flex flex-wrap gap-2 mt-3 pt-3 border-top">
+      <a href="{{ url_for('customer.medicines_list', q=search_query) }}"
+         class="btn btn-sm {% if not selected_category %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-pill">
+        All Categories
+      </a>
+      {% for cat in categories %}
+      <a href="{{ url_for('customer.medicines_list', category=cat.category, q=search_query) }}"
+         class="btn btn-sm {% if selected_category == cat.category %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-pill">
+        {{ cat.category }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Academic Disclaimer & Request Banner -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-7">
+      <div class="p-3 bg-light border-start border-4 border-info rounded shadow-sm h-100">
+        <div class="small text-muted">
+          <i class="fa-solid fa-circle-info text-info me-1"></i>
+          <b>Important Note:</b> Medicine availability is <i>reported periodically by registered local pharmacies</i>. Please call the pharmacy to confirm before traveling.
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="p-3 bg-white border border-success rounded shadow-sm d-flex justify-content-between align-items-center h-100">
+        <div>
+          <div class="fw-bold text-dark small">Medicine not listed?</div>
+          <div class="text-muted" style="font-size: 0.75rem;">Broadcast inquiry to all local pharmacies.</div>
+        </div>
+        <a href="{{ url_for('customer.medicine_request', prefill=search_query) }}" class="btn btn-sm btn-outline-success fw-bold">
+          <i class="fa-solid fa-file-prescription me-1"></i> Request Medicine
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medicine Results List -->
+  <div class="row g-4 mb-5">
+    {% if medicines %}
+      {% for m in medicines %}
+      <div class="col-md-6 col-lg-4">
+        <div class="medicine-card p-3 d-flex flex-column justify-content-between"
+             data-speech-en="{{ m.medicine_name }} {{ m.strength }}. Reported {{ m.availability }} at {{ m.pharmacy_name }}, {{ m.distance }} kilometers away. Price is {{ m.price }} rupees. Reported {{ m.updated_ago }}. Tap the green button to call the pharmacy."
+             data-speech-te="{{ m.medicine_name }}. {{ m.pharmacy_name }} లో {{ m.availability }}. దూరం {{ m.distance }} కిలోమీటర్లు. ధర {{ m.price }} రూపాయలు. మెడికల్ షాప్ వారితో మాట్లాడటానికి కాల్ చేయండి.">
+          <div>
+            <!-- Status & Distance Badges -->
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              {% if m.availability == 'Available' %}
+                <span class="status-available">
+                  <i class="fa-solid fa-circle-check"></i> Available
+                </span>
+              {% elif m.availability == 'Low Stock' %}
+                <span class="status-low-stock">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Low Stock
+                </span>
+              {% else %}
+                <span class="status-unavailable">
+                  <i class="fa-solid fa-circle-xmark"></i> Unavailable
+                </span>
+              {% endif %}
+
+              <span class="distance-badge">
+                <i class="fa-solid fa-location-dot text-danger"></i> {{ m.distance }} km away
+              </span>
+            </div>
+
+            <!-- Medicine Name & Strengths -->
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="service-icon-box m-0 bg-success bg-opacity-10 text-success" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                <i class="fa-solid {{ m.icon or 'fa-pills' }}"></i>
+              </div>
+              <div>
+                <h5 class="fw-bold mb-0 text-dark">{{ m.medicine_name }}</h5>
+                <span class="badge bg-light text-secondary border">{{ m.strength }} &bull; {{ m.category }}</span>
+              </div>
+            </div>
+
+            {% if m.telugu_name %}
+              <div class="small text-secondary mb-2 fst-italic">
+                {{ m.telugu_name }} / {{ m.hindi_name }}
+              </div>
+            {% endif %}
+
+            <p class="text-muted small mb-2">{{ m.medicine_desc }}</p>
+
+            <!-- Pharmacy details box -->
+            <div class="bg-light p-2 rounded mb-3 small">
+              <div class="fw-bold text-dark mb-1">
+                <i class="fa-solid fa-clinic-medical text-success me-1"></i> {{ m.pharmacy_name }}
+              </div>
+              <div class="text-muted mb-1">
+                <i class="fa-solid fa-map-pin text-danger me-1"></i> {{ m.pharmacy_address }}
+              </div>
+              <div class="d-flex justify-content-between align-items-center pt-1 border-top">
+                <span class="text-success fw-bold">Est. Price: ₹{{ m.price }}</span>
+                <span class="timestamp-note"><i class="fa-solid fa-clock"></i> {{ m.updated_ago }}</span>
+              </div>
+            </div>
+
+            {% if m.notes %}
+              <div class="small text-muted bg-warning bg-opacity-10 p-2 rounded mb-3">
+                <i class="fa-solid fa-note-sticky text-warning me-1"></i> {{ m.notes }}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Action buttons with TTS and Direct Call -->
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-speaker" onclick="readCardAloud(this)" title="Listen to availability">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <a href="tel:{{ m.pharmacy_phone }}" class="btn btn-sm btn-call flex-grow-1 d-flex align-items-center justify-content-center gap-1">
+              <i class="fa-solid fa-phone"></i> Call Pharmacy
+            </a>
+            <a href="https://wa.me/{{ m.pharmacy_phone|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12 text-center py-5">
+        <i class="fa-solid fa-prescription-bottle display-3 text-muted mb-3"></i>
+        <h4 class="fw-bold text-secondary">No pharmacies reporting this medicine currently</h4>
+        <p class="text-muted">You can broadcast a direct Medicine Request to all registered local pharmacies.</p>
+        <a href="{{ url_for('customer.medicine_request', prefill=search_query) }}" class="btn btn-primary btn-lg fw-bold">
+          <i class="fa-solid fa-file-prescription me-2"></i> Request Medicine Availability Now
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

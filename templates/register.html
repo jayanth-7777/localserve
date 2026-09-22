@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Register New Account - LOCALServe{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+
+      <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border mb-4">
+        <div class="text-center mb-4">
+          <div class="service-icon-box bg-warning bg-opacity-25 text-dark mb-2" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-user-plus fs-3"></i>
+          </div>
+          <h3 class="fw-bold text-dark">Join LOCALServe</h3>
+          <p class="text-muted small">Register as a customer, verified local technician, or community pharmacy</p>
+        </div>
+
+        <form action="{{ url_for('auth.register') }}" method="POST" id="registerForm">
+          
+          <!-- Role Selector -->
+          <div class="mb-4">
+            <label class="form-label fw-bold small text-uppercase text-secondary">I want to register as a:</label>
+            <div class="row g-2">
+              <div class="col-4">
+                <input type="radio" class="btn-check" name="role" id="roleCustomer" value="customer" checked onchange="handleRoleChange('customer')">
+                <label class="btn btn-outline-primary w-100 py-2 fw-bold" for="roleCustomer">
+                  <i class="fa-solid fa-user d-block fs-4 mb-1"></i> Customer
+                </label>
+              </div>
+              <div class="col-4">
+                <input type="radio" class="btn-check" name="role" id="roleProvider" value="provider" onchange="handleRoleChange('provider')">
+                <label class="btn btn-outline-warning text-dark w-100 py-2 fw-bold" for="roleProvider">
+                  <i class="fa-solid fa-screwdriver-wrench d-block fs-4 mb-1 text-warning"></i> Provider
+                </label>
+              </div>
+              <div class="col-4">
+                <input type="radio" class="btn-check" name="role" id="rolePharmacy" value="pharmacy" onchange="handleRoleChange('pharmacy')">
+                <label class="btn btn-outline-success w-100 py-2 fw-bold" for="rolePharmacy">
+                  <i class="fa-solid fa-prescription-bottle-medical d-block fs-4 mb-1 text-success"></i> Pharmacy
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Basic User Info -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Full Name</label>
+              <input type="text" name="name" class="form-control" required placeholder="e.g. Ramesh Kumar">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Mobile Phone Number</label>
+              <input type="tel" name="phone" class="form-control" required placeholder="+91 9876543210">
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Email Address</label>
+              <input type="email" name="email" class="form-control" required placeholder="name@example.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Password</label>
+              <input type="password" name="password" class="form-control" required placeholder="Minimum 6 characters">
+            </div>
+          </div>
+
+          <!-- PROVIDER SPECIFIC SECTION -->
+          <div id="providerFields" class="p-3 bg-light rounded-3 border mb-3 d-none">
+            <h6 class="fw-bold text-warning text-dark mb-3">
+              <i class="fa-solid fa-tools me-1"></i> Professional Technician Profile
+            </h6>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Service Category</label>
+                <select name="category" class="form-select">
+                  {% for s in services %}
+                    <option value="{{ s.category }}">{{ s.name }} ({{ s.telugu_name or '' }})</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold small">Experience (Yrs)</label>
+                <input type="number" name="experience_years" class="form-control" value="2" min="0">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold small">Rate (₹/Hour)</label>
+                <input type="number" name="charges_per_hr" class="form-control" value="150" min="50">
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label fw-bold small">Bio & Special Skills</label>
+              <textarea name="bio" class="form-control" rows="2" placeholder="e.g. Expert in house wiring, tube well starters, invertors..."></textarea>
+            </div>
+          </div>
+
+          <!-- PHARMACY SPECIFIC SECTION -->
+          <div id="pharmacyFields" class="p-3 bg-light rounded-3 border mb-3 d-none">
+            <h6 class="fw-bold text-success mb-3">
+              <i class="fa-solid fa-clinic-medical me-1"></i> Pharmacy Details
+            </h6>
+            <div class="mb-3">
+              <label class="form-label fw-bold small">Pharmacy Store Name</label>
+              <input type="text" name="pharmacy_name" class="form-control" placeholder="e.g. Balaji Medical & General Store">
+            </div>
+            <div class="mb-2">
+              <label class="form-label fw-bold small">Operating Timings</label>
+              <input type="text" name="timings" class="form-control" value="8:00 AM - 10:00 PM">
+            </div>
+          </div>
+
+          <!-- Address & GPS Coordinates -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label fw-bold small mb-0">Village / Landmark / Street Address</label>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="detectCoordsForRegister()">
+                <i class="fa-solid fa-location-crosshairs text-danger me-1"></i> Use My GPS Coords
+              </button>
+            </div>
+            <textarea name="address" class="form-control" rows="2" required placeholder="House No, Village/Town, Nearby Landmark..."></textarea>
+            
+            <input type="hidden" name="latitude" id="regLat" value="17.3850">
+            <input type="hidden" name="longitude" id="regLng" value="78.4867">
+            <div class="small text-muted mt-1" id="coordsDisplay">Default Location: 17.3850, 78.4867</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 fw-bold py-2 fs-6">
+            <i class="fa-solid fa-check me-1"></i> Complete Registration
+          </button>
+        </form>
+
+        <div class="text-center small text-muted mt-3">
+          Already have an account? <a href="{{ url_for('auth.login') }}" class="fw-bold">Sign In here</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function handleRoleChange(role) {
+    const provDiv = document.getElementById('providerFields');
+    const pharmDiv = document.getElementById('pharmacyFields');
+
+    if (role === 'provider') {
+      provDiv.classList.remove('d-none');
+      pharmDiv.classList.add('d-none');
+    } else if (role === 'pharmacy') {
+      pharmDiv.classList.remove('d-none');
+      provDiv.classList.add('d-none');
+    } else {
+      provDiv.classList.add('d-none');
+      pharmDiv.classList.add('d-none');
+    }
+  }
+
+  function detectCoordsForRegister() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        document.getElementById('regLat').value = pos.coords.latitude;
+        document.getElementById('regLng').value = pos.coords.longitude;
+        document.getElementById('coordsDisplay').innerHTML = `📍 GPS Set: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+        alert("GPS Coordinates captured successfully!");
+      });
+    }
+  }
+</script>
+{% endblock %}

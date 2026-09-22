@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+
+{% block title %}LOCALServe - Hyperlocal Services & Pharmacy Availability{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Hero Section with Voice Search -->
+  <div class="p-4 p-md-5 mb-4 rounded-4 bg-primary text-white shadow-sm position-relative overflow-hidden">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-2 fs-6">
+          <i class="fa-solid fa-location-dot"></i> <span data-i18n="tagline">Hyperlocal Community Platform</span>
+        </span>
+        <h1 class="display-5 fw-extrabold text-white mb-3">
+          Find Local Services & Check Medicine Availability
+        </h1>
+        <p class="lead mb-4 text-light">
+          Connect directly with verified electricians, plumbers, carpenters, mechanics, and nearby pharmacies reporting available medicines in your village or town.
+        </p>
+
+        <!-- Search Bar with Big Microphone Button -->
+        <form action="{{ url_for('customer.services_list') }}" method="GET" id="heroSearchForm" class="d-flex align-items-center gap-2 bg-white p-2 rounded-4 shadow">
+          <button type="button" class="btn-mic ms-1" onclick="startVoiceSearch('heroSearchInput', 'heroSearchForm')" title="Tap and speak in Telugu, Hindi, or English">
+            <i class="fa-solid fa-microphone fs-5"></i>
+          </button>
+          <input type="text" class="form-control border-0 fs-5 ps-2" id="heroSearchInput" name="q"
+                 placeholder="Search electrician, plumber, mechanic, medicine..." data-i18n="search_placeholder_service">
+          <button type="submit" class="btn btn-warning px-4 py-2 fw-bold text-dark rounded-3 fs-6">
+            <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+          </button>
+        </form>
+        <div class="mt-2 text-light small d-flex align-items-center gap-3">
+          <span><i class="fa-solid fa-circle-info text-warning"></i> <b>Tip:</b> Click the red microphone to speak in Telugu, Hindi, or English!</span>
+        </div>
+      </div>
+      <div class="col-lg-4 d-none d-lg-block text-center">
+        <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25">
+          <i class="fa-solid fa-house-chimney-medical display-1 text-warning mb-3"></i>
+          <h4 class="text-white fw-bold">Community First</h4>
+          <p class="small text-light mb-0">Bridging rural communities with essential technical skills and healthcare supply info.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RURAL QUICK ASSIST SECTION (Pictorial Cards & Voice Support) -->
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <div>
+        <h2 class="fw-bold mb-1 text-primary">
+          <i class="fa-solid fa-people-roof text-warning me-2"></i>
+          <span data-i18n="rural_mode">Gramin Quick-Assist (గ్రామీణ తక్షణ సహాయం)</span>
+        </h2>
+        <p class="text-muted mb-0 small">
+          Tap any card to call directly or press the speaker button 🔊 to hear details read aloud.
+        </p>
+      </div>
+      <button class="btn btn-sm btn-outline-primary" onclick="speakText('గ్రామీణ తక్షణ సహాయం. మీకు కావలసిన పనిని ఎంచుకోండి: కరెంట్ పనులు, పైపుల పనులు, చెక్క పనులు, మెకానిక్ లేదా మందులు.', 'te')">
+        <i class="fa-solid fa-volume-high me-1"></i> <span data-i18n="listen">వినండి (Listen)</span>
+      </button>
+    </div>
+
+    <div class="row g-3">
+      <!-- 1. Electrician -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="rural-card"
+             data-speech-en="Electrician services. Wiring, switch repairs, pump starter. Tap to call or book."
+             data-speech-te="విద్యుత్ పనులు. ఎలక్ట్రీషియన్ వైరింగ్, మోటార్ స్టార్టర్, స్విచ్ రిపేర్. మాట్లాడేందుకు కాల్ చేయండి."
+             data-speech-hi="बिजली मिस्त्री. वायरिंग, मोटर स्टार्टर और स्विच मरम्मत.">
+          <div>
+            <div class="rural-icon text-warning"><i class="fa-solid fa-bolt"></i></div>
+            <div class="rural-title">Electrician</div>
+            <div class="rural-subtitle">కరెంట్ పనులు</div>
+          </div>
+          <div>
+            <button class="btn btn-sm btn-light btn-speaker mb-2 w-100" onclick="readCardAloud(this)">
+              <i class="fa-solid fa-volume-high"></i> వినండి
+            </button>
+            <a href="{{ url_for('customer.services_list', category='Electrician') }}" class="btn-rural-call">
+              <i class="fa-solid fa-phone"></i> Call
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Plumber -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="rural-card"
+             data-speech-en="Plumbing services. Water pipe leaks, tap fitting, borewell motor connection."
+             data-speech-te="ప్లంబర్ పనులు. పైపు లీకేజ్, నల్లాల బిగింపు, మోటార్ కనెక్షన్. మాట్లాడేందుకు కాల్ చేయండి."
+             data-speech-hi="नल मिस्त्री. पाइप लीकेज और मोटर कनेक्शन.">
+          <div>
+            <div class="rural-icon text-info"><i class="fa-solid fa-faucet-drip"></i></div>
+            <div class="rural-title">Plumber</div>
+            <div class="rural-subtitle">పైపులు, మోటార్</div>
+          </div>
+          <div>
+            <button class="btn btn-sm btn-light btn-speaker mb-2 w-100" onclick="readCardAloud(this)">
+              <i class="fa-solid fa-volume-high"></i> వినండి
+            </button>
+            <a href="{{ url_for('customer.services_list', category='Plumber') }}" class="btn-rural-call">
+              <i class="fa-solid fa-phone"></i> Call
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Carpenter -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="rural-card"
+             data-speech-en="Carpenter wood works. Door locks, furniture fixing, wooden repairs."
+             data-speech-te="వడ్రంగి చెక్క పనులు. తలుపు తాళాలు, మంచం, టేబుల్ రిపేర్."
+             data-speech-hi="बढ़ई लकड़ी का काम. दरवाजा लॉक और फर्नीचर मरम्मत.">
+          <div>
+            <div class="rural-icon text-warning"><i class="fa-solid fa-hammer"></i></div>
+            <div class="rural-title">Carpenter</div>
+            <div class="rural-subtitle">చెక్క పనులు</div>
+          </div>
+          <div>
+            <button class="btn btn-sm btn-light btn-speaker mb-2 w-100" onclick="readCardAloud(this)">
+              <i class="fa-solid fa-volume-high"></i> వినండి
+            </button>
+            <a href="{{ url_for('customer.services_list', category='Carpenter') }}" class="btn-rural-call">
+              <i class="fa-solid fa-phone"></i> Call
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Mechanic -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="rural-card"
+             data-speech-en="Vehicle & Tractor Mechanic. Puncture, engine startup, bike repairs."
+             data-speech-te="మెకానిక్. బైక్, ట్రాక్టర్, ఇంజిన్ మరమ్మత్తు, పంచర్."
+             data-speech-hi="मैकेनिक. बाइक और ट्रैक्टर मरम्मत, पंचर.">
+          <div>
+            <div class="rural-icon text-danger"><i class="fa-solid fa-wrench"></i></div>
+            <div class="rural-title">Mechanic</div>
+            <div class="rural-subtitle">ట్రాక్టర్, బైక్</div>
+          </div>
+          <div>
+            <button class="btn btn-sm btn-light btn-speaker mb-2 w-100" onclick="readCardAloud(this)">
+              <i class="fa-solid fa-volume-high"></i> వినండి
+            </button>
+            <a href="{{ url_for('customer.services_list', category='Mechanic') }}" class="btn-rural-call">
+              <i class="fa-solid fa-phone"></i> Call
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Medicine Availability -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="rural-card border-success"
+             data-speech-en="Medicine availability finder. Check which nearby pharmacies have Paracetamol, ORS, fever, cold medicines."
+             data-speech-te="మందుల లభ్యత. జ్వరం, జలుబు, షుగర్ మందులు దగ్గర్లోని మెడికల్ షాపుల్లో ఉన్నాయో లేదో తెలుసుకోండి."
+             data-speech-hi="दवा उपलब्धता. नजदीकी मेडिकल स्टोर पर दवा स्टॉक की जांच करें.">
+          <div>
+            <div class="rural-icon text-success"><i class="fa-solid fa-pills"></i></div>
+            <div class="rural-title">Medicines</div>
+            <div class="rural-subtitle">మందుల షాపు</div>
+          </div>
+          <div>
+            <button class="btn btn-sm btn-light btn-speaker mb-2 w-100" onclick="readCardAloud(this)">
+              <i class="fa-solid fa-volume-high"></i> వినండి
+            </button>
+            <a href="{{ url_for('customer.medicines_list') }}" class="btn-rural-call bg-success">
+              <i class="fa-solid fa-magnifying-glass"></i> Check
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Emergency 108 -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="rural-card border-danger"
+             data-speech-en="Emergency ambulance 108. Free emergency medical helpline."
+             data-speech-te="అత్యవసర అంబులెన్స్ 108. ఉచిత ఆరోగ్య హెల్ప్‌లైన్. వెంటనే కాల్ చేయండి."
+             data-speech-hi="आपातकालीन एम्बुलेंस 108.">
+          <div>
+            <div class="rural-icon text-danger"><i class="fa-solid fa-truck-medical"></i></div>
+            <div class="rural-title text-danger">Emergency</div>
+            <div class="rural-subtitle">అంబులెన్స్ 108</div>
+          </div>
+          <div>
+            <button class="btn btn-sm btn-light btn-speaker mb-2 w-100" onclick="readCardAloud(this)">
+              <i class="fa-solid fa-volume-high"></i> వినండి
+            </button>
+            <a href="tel:108" class="btn-rural-call bg-danger">
+              <i class="fa-solid fa-phone"></i> 108
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verified Service Providers in Community -->
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="fw-bold mb-0">
+          <i class="fa-solid fa-certificate text-success me-2"></i> Verified Service Technicians
+        </h3>
+        <span class="text-muted small">Only admin-verified local technicians with verified contacts</span>
+      </div>
+      <a href="{{ url_for('customer.services_list') }}" class="btn btn-sm btn-outline-primary fw-bold">
+        View All Technicians <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for p in providers %}
+      <div class="col-md-6 col-lg-4">
+        <div class="provider-card p-3 d-flex flex-column justify-content-between"
+             data-speech-en="{{ p.name }}, {{ p.category }}, {{ p.distance }} kilometers away, charges {{ p.charges_per_hr }} rupees per hour. Rating: {{ p.rating }} stars. Tap green button to call."
+             data-speech-te="{{ p.name }}, {{ p.category }} పనులు. {{ p.distance }} కిలోమీటర్ల దూరంలో ఉన్నారు. గంటకు {{ p.charges_per_hr }} రూపాయల ఛార్జీ. మాట్లాడటానికి ఆకుపచ్చ బటన్ నొక్కండి.">
+          <div>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="provider-badge-verified">
+                <i class="fa-solid fa-check-circle"></i> Verified
+              </span>
+              <span class="distance-badge">
+                <i class="fa-solid fa-location-dot text-danger"></i> {{ p.distance }} km away
+              </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="service-icon-box m-0" style="width: 54px; height: 54px; font-size: 1.4rem;">
+                <i class="fa-solid {{ p.icon or 'fa-wrench' }}"></i>
+              </div>
+              <div>
+                <h5 class="fw-bold mb-0 text-dark">{{ p.name }}</h5>
+                <span class="badge bg-light text-primary border">{{ p.category }}</span>
+              </div>
+            </div>
+
+            <p class="text-muted small mb-2 text-truncate-2">{{ p.bio }}</p>
+
+            <div class="d-flex justify-content-between small text-muted mb-3 bg-light p-2 rounded">
+              <span><i class="fa-solid fa-indian-rupee-sign text-success"></i> <b>₹{{ p.charges_per_hr }}</b>/hr</span>
+              <span><i class="fa-solid fa-briefcase text-secondary"></i> {{ p.experience_years }} yrs exp</span>
+              <span><i class="fa-solid fa-star text-warning"></i> <b>{{ p.rating }}</b> ({{ p.rating_count }})</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-speaker" onclick="readCardAloud(this)" title="Listen to provider info">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+              <a href="tel:{{ p.phone }}" class="btn btn-sm btn-call flex-grow-1 d-flex align-items-center justify-content-center gap-1">
+                <i class="fa-solid fa-phone"></i> Call Now
+              </a>
+              <a href="https://wa.me/{{ p.phone|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-whatsapp">
+                <i class="fa-brands fa-whatsapp"></i>
+              </a>
+              <a href="{{ url_for('customer.provider_detail', provider_id=p.provider_id) }}" class="btn btn-sm btn-outline-primary">
+                Book
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Medicine Availability Spotlight -->
+  <div class="mb-5 bg-white p-4 rounded-4 shadow-sm border">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <div>
+        <h3 class="fw-bold mb-0 text-success">
+          <i class="fa-solid fa-prescription-bottle-medical me-2"></i> Local Medicine Availability Finder
+        </h3>
+        <span class="text-muted small">
+          Pharmacy-reported availability with last-updated timestamps
+        </span>
+      </div>
+      <a href="{{ url_for('customer.medicines_list') }}" class="btn btn-sm btn-success fw-bold">
+        Check All Medicines <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <!-- Quick pills for common community medicines -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <a href="{{ url_for('customer.medicines_list', q='Paracetamol') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+        <i class="fa-solid fa-tablets text-primary"></i> Paracetamol 500mg
+      </a>
+      <a href="{{ url_for('customer.medicines_list', q='ORS') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+        <i class="fa-solid fa-glass-water text-warning"></i> ORS Sachet
+      </a>
+      <a href="{{ url_for('customer.medicines_list', q='Cetirizine') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+        <i class="fa-solid fa-capsules text-danger"></i> Cetirizine 10mg
+      </a>
+      <a href="{{ url_for('customer.medicines_list', q='Cough') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+        <i class="fa-solid fa-bottle-droplet text-info"></i> Cough Syrup
+      </a>
+      <a href="{{ url_for('customer.medicines_list', q='Pantoprazole') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+        <i class="fa-solid fa-pills text-success"></i> Pantoprazole 40mg
+      </a>
+      <a href="{{ url_for('customer.medicines_list', q='Metformin') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+        <i class="fa-solid fa-tablets text-primary"></i> Metformin (Sugar)
+      </a>
+    </div>
+
+    <!-- Community Medicine Request Banner -->
+    <div class="p-3 bg-light border border-success rounded-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div>
+        <h5 class="fw-bold mb-1 text-dark">
+          <i class="fa-solid fa-notes-medical text-success me-2"></i> Cannot find your prescribed medicine nearby?
+        </h5>
+        <p class="mb-0 text-muted small">
+          Submit a request with prescription photo. All registered local pharmacies will be alerted to respond.
+        </p>
+      </div>
+      <a href="{{ url_for('customer.medicine_request') }}" class="btn btn-primary fw-bold px-3 py-2">
+        <i class="fa-solid fa-file-prescription me-1"></i> Request Medicine Availability
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

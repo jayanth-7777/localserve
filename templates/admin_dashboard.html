@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+
+{% block title %}System Administration Panel - LOCALServe{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h3 class="fw-bold mb-0 text-danger">
+        <i class="fa-solid fa-user-shield me-2"></i> LOCALServe Platform Administration
+      </h3>
+      <span class="text-muted small">Panchayat & Community Management Console</span>
+    </div>
+    <span class="badge bg-danger fs-6 px-3 py-2">
+      <i class="fa-solid fa-lock me-1"></i> Admin Privileges Active
+    </span>
+  </div>
+
+  <!-- Platform KPI Cards -->
+  <div class="row g-3 mb-4 text-center">
+    <div class="col-6 col-md-3">
+      <div class="bg-white p-3 rounded-4 shadow-sm border">
+        <div class="text-muted small">Total Users</div>
+        <h3 class="fw-bold text-dark mb-0">{{ stats.total_users }}</h3>
+        <span class="text-secondary small">{{ stats.total_providers }} providers &bull; {{ stats.total_pharmacies }} pharmacies</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bg-white p-3 rounded-4 shadow-sm border border-success">
+        <div class="text-muted small">Verified Providers</div>
+        <h3 class="fw-bold text-success mb-0">{{ stats.verified_providers }}</h3>
+        <span class="badge bg-warning text-dark">{{ stats.pending_providers }} Pending</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bg-white p-3 rounded-4 shadow-sm border border-primary">
+        <div class="text-muted small">Bookings Completed</div>
+        <h3 class="fw-bold text-primary mb-0">{{ stats.completed_bookings }}</h3>
+        <span class="text-muted small">Out of {{ stats.total_bookings }} total</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bg-white p-3 rounded-4 shadow-sm border border-danger">
+        <div class="text-muted small">Open Complaints</div>
+        <h3 class="fw-bold text-danger mb-0">{{ stats.open_complaints }}</h3>
+        <span class="text-muted small">{{ stats.total_requests }} medicine inquiries</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-pills mb-4 gap-2" id="adminTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active fw-bold" data-bs-toggle="pill" data-bs-target="#providersTab">
+        <i class="fa-solid fa-user-check me-1"></i> Providers Verification ({{ providers|length }})
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#pharmaciesTab">
+        <i class="fa-solid fa-clinic-medical me-1"></i> Pharmacies Verification ({{ pharmacies|length }})
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#complaintsTab">
+        <i class="fa-solid fa-triangle-exclamation me-1"></i> Complaints & Grievances ({{ complaints|length }})
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#servicesTab">
+        <i class="fa-solid fa-list-check me-1"></i> Service Categories ({{ services|length }})
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#bookingsTab">
+        <i class="fa-solid fa-clock-rotate-left me-1"></i> Bookings Audit
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content Panes -->
+  <div class="tab-content" id="adminTabsContent">
+
+    <!-- 1. PROVIDERS VERIFICATION -->
+    <div class="tab-pane fade show active" id="providersTab">
+      <div class="bg-white p-4 rounded-4 shadow-sm border">
+        <h5 class="fw-bold mb-3">Service Providers Verification Queue</h5>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Provider Name</th>
+                <th>Category & Rate</th>
+                <th>Contact & Location</th>
+                <th>Current Status</th>
+                <th>Verification Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in providers %}
+              <tr>
+                <td>
+                  <span class="fw-bold text-dark">{{ p.name }}</span>
+                  <div class="text-muted small">Registered: {{ p.registered_date|timeago }}</div>
+                </td>
+                <td>
+                  <span class="badge bg-light text-primary border">{{ p.category }}</span>
+                  <div class="small text-muted">₹{{ p.charges_per_hr }}/hr &bull; {{ p.experience_years }} yrs exp</div>
+                </td>
+                <td>
+                  <div><i class="fa-solid fa-phone small text-secondary"></i> {{ p.phone }}</div>
+                  <div class="small text-muted text-truncate" style="max-width: 200px;">{{ p.address }}</div>
+                </td>
+                <td>
+                  {% if p.verification_status == 'Verified' %}
+                    <span class="provider-badge-verified"><i class="fa-solid fa-check"></i> Verified</span>
+                  {% elif p.verification_status == 'Pending' %}
+                    <span class="provider-badge-pending"><i class="fa-solid fa-clock"></i> Pending</span>
+                  {% elif p.verification_status == 'Suspended' %}
+                    <span class="badge bg-danger">Suspended</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Rejected</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <form action="{{ url_for('admin.update_provider_status', provider_id=p.provider_id) }}" method="POST" class="d-flex gap-1">
+                    {% if p.verification_status != 'Verified' %}
+                      <button type="submit" name="status" value="Verified" class="btn btn-sm btn-success" title="Approve as Verified">
+                        <i class="fa-solid fa-check"></i> Approve
+                      </button>
+                    {% endif %}
+                    {% if p.verification_status != 'Rejected' %}
+                      <button type="submit" name="status" value="Rejected" class="btn btn-sm btn-outline-danger" title="Reject">
+                        Reject
+                      </button>
+                    {% endif %}
+                    {% if p.verification_status != 'Suspended' %}
+                      <button type="submit" name="status" value="Suspended" class="btn btn-sm btn-warning" title="Suspend">
+                        Suspend
+                      </button>
+                    {% endif %}
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PHARMACIES VERIFICATION -->
+    <div class="tab-pane fade" id="pharmaciesTab">
+      <div class="bg-white p-4 rounded-4 shadow-sm border">
+        <h5 class="fw-bold mb-3">Community Pharmacies Verification Queue</h5>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Pharmacy Name</th>
+                <th>Phone & Timings</th>
+                <th>Address</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ph in pharmacies %}
+              <tr>
+                <td>
+                  <span class="fw-bold text-dark">{{ ph.name }}</span>
+                  <div class="text-muted small">Registered: {{ ph.registered_date|timeago }}</div>
+                </td>
+                <td>
+                  <div><i class="fa-solid fa-phone small text-secondary"></i> {{ ph.phone }}</div>
+                  <div class="small text-muted">{{ ph.timings }}</div>
+                </td>
+                <td>
+                  <span class="small text-muted">{{ ph.address }}</span>
+                </td>
+                <td>
+                  {% if ph.verification_status == 'Verified' %}
+                    <span class="badge bg-success"><i class="fa-solid fa-check"></i> Verified</span>
+                  {% elif ph.verification_status == 'Pending' %}
+                    <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock"></i> Pending</span>
+                  {% else %}
+                    <span class="badge bg-danger">{{ ph.verification_status }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <form action="{{ url_for('admin.update_pharmacy_status', pharmacy_id=ph.pharmacy_id) }}" method="POST" class="d-flex gap-1">
+                    {% if ph.verification_status != 'Verified' %}
+                      <button type="submit" name="status" value="Verified" class="btn btn-sm btn-success">
+                        <i class="fa-solid fa-check"></i> Approve
+                      </button>
+                    {% endif %}
+                    {% if ph.verification_status != 'Rejected' %}
+                      <button type="submit" name="status" value="Rejected" class="btn btn-sm btn-outline-danger">
+                        Reject
+                      </button>
+                    {% endif %}
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. COMPLAINTS -->
+    <div class="tab-pane fade" id="complaintsTab">
+      <div class="bg-white p-4 rounded-4 shadow-sm border">
+        <h5 class="fw-bold mb-3">User Grievances & Platform Complaints</h5>
+        {% if complaints %}
+          <div class="list-group">
+            {% for c in complaints %}
+            <div class="list-group-item p-3 mb-3 border rounded-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <span class="badge bg-danger me-2">Complaint #{{ c.complaint_id }}</span>
+                  <span class="badge bg-light text-dark border">{{ c.target_type }}</span>
+                  <h6 class="fw-bold d-inline ms-2 text-dark">{{ c.title }}</h6>
+                </div>
+                <span class="badge {% if c.status == 'Resolved' %}bg-success{% elif c.status == 'Investigating' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                  {{ c.status }}
+                </span>
+              </div>
+
+              <div class="small text-muted mb-2">
+                <b>Complainant:</b> {{ c.complainant_name }} ({{ c.complainant_phone }}) &bull; Filed {{ c.created_ago }}
+              </div>
+
+              <div class="bg-light p-2 rounded small text-dark mb-3">
+                <b>Description:</b> {{ c.description }}
+              </div>
+
+              {% if c.admin_notes %}
+                <div class="small text-success mb-2">
+                  <b>Admin Resolution Notes:</b> {{ c.admin_notes }}
+                </div>
+              {% endif %}
+
+              <!-- Action form -->
+              <form action="{{ url_for('admin.resolve_complaint', complaint_id=c.complaint_id) }}" method="POST" class="d-flex gap-2 align-items-center">
+                <input type="text" name="admin_notes" class="form-control form-control-sm" placeholder="Resolution explanation / action taken...">
+                <select name="status" class="form-select form-select-sm w-auto">
+                  <option value="Resolved">Mark Resolved</option>
+                  <option value="Investigating">Mark Investigating</option>
+                  <option value="Dismissed">Dismiss</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary fw-bold text-nowrap">Update</button>
+              </form>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-4 text-muted small">No complaints reported.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 4. SERVICE CATEGORIES -->
+    <div class="tab-pane fade" id="servicesTab">
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="bg-white p-4 rounded-4 shadow-sm border">
+            <h5 class="fw-bold mb-3">Active Community Service Categories</h5>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Category</th>
+                    <th>Icon</th>
+                    <th>Telugu / Hindi</th>
+                    <th>Base Rate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for s in services %}
+                  <tr>
+                    <td><b>{{ s.name }}</b></td>
+                    <td><i class="fa-solid {{ s.icon }} text-primary fs-5"></i></td>
+                    <td class="small text-muted">{{ s.telugu_name }}<br>{{ s.hindi_name }}</td>
+                    <td>₹{{ s.base_price }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="bg-white p-4 rounded-4 shadow-sm border">
+            <h5 class="fw-bold text-primary mb-3">Add / Update Service Category</h5>
+            <form action="{{ url_for('admin.add_service') }}" method="POST">
+              <div class="mb-2">
+                <label class="form-label small fw-bold">English Name</label>
+                <input type="text" name="name" class="form-control form-control-sm" required placeholder="e.g. Mason / Mestri">
+              </div>
+              <div class="mb-2">
+                <label class="form-label small fw-bold">Unique Category Code</label>
+                <input type="text" name="category" class="form-control form-control-sm" required placeholder="e.g. Mason">
+              </div>
+              <div class="mb-2">
+                <label class="form-label small fw-bold">FontAwesome Icon Class</label>
+                <input type="text" name="icon" class="form-control form-control-sm" value="fa-tools">
+              </div>
+              <div class="mb-2">
+                <label class="form-label small fw-bold">Telugu Translation</label>
+                <input type="text" name="telugu_name" class="form-control form-control-sm" placeholder="e.g. తాపీ మేస్త్రి">
+              </div>
+              <div class="mb-2">
+                <label class="form-label small fw-bold">Hindi Translation</label>
+                <input type="text" name="hindi_name" class="form-control form-control-sm" placeholder="e.g. राजमिस्त्री">
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Base Price (₹)</label>
+                <input type="number" name="base_price" class="form-control form-control-sm" value="200">
+              </div>
+              <button type="submit" class="btn btn-sm btn-primary fw-bold w-100">Save Service</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. BOOKINGS AUDIT -->
+    <div class="tab-pane fade" id="bookingsTab">
+      <div class="bg-white p-4 rounded-4 shadow-sm border">
+        <h5 class="fw-bold mb-3">Platform Bookings Audit Trail</h5>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle small">
+            <thead class="table-light">
+              <tr>
+                <th>Booking ID</th>
+                <th>Customer</th>
+                <th>Provider</th>
+                <th>Service</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in recent_bookings %}
+              <tr>
+                <td><b>#{{ b.booking_id }}</b></td>
+                <td>{{ b.customer_name }}</td>
+                <td>{{ b.provider_name }}</td>
+                <td>{{ b.service_name }}</td>
+                <td>{{ b.booking_date }} {{ b.booking_time }}</td>
+                <td>
+                  <span class="badge {% if b.status == 'Completed' %}bg-success{% elif b.status == 'Rejected' %}bg-danger{% else %}bg-primary{% endif %}">
+                    {{ b.status }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

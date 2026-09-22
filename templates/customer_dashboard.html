@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer Dashboard - LOCALServe{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h3 class="fw-bold mb-0 text-primary">
+        <i class="fa-solid fa-user-circle me-2"></i> Welcome, {{ user.name }}
+      </h3>
+      <span class="text-muted small">Registered Phone: {{ user.phone }} &bull; Location: {{ user.address or 'Community Center' }}</span>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('customer.services_list') }}" class="btn btn-outline-primary btn-sm fw-bold">
+        <i class="fa-solid fa-plus me-1"></i> Book New Service
+      </a>
+      <a href="{{ url_for('customer.medicine_request') }}" class="btn btn-success btn-sm fw-bold">
+        <i class="fa-solid fa-prescription-bottle me-1"></i> Request Medicine
+      </a>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-pills mb-4 gap-2" id="customerTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active fw-bold" id="bookings-tab" data-bs-toggle="pill" data-bs-target="#bookings" type="button">
+        <i class="fa-solid fa-calendar-check me-1"></i> My Service Bookings ({{ bookings|length }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold" id="medreqs-tab" data-bs-toggle="pill" data-bs-target="#medreqs" type="button">
+        <i class="fa-solid fa-file-prescription me-1"></i> Medicine Requests ({{ medicine_requests|length }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold" id="complaints-tab" data-bs-toggle="pill" data-bs-target="#complaints" type="button">
+        <i class="fa-solid fa-shield-halved me-1"></i> File Complaint / Report
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Contents -->
+  <div class="tab-content" id="customerTabsContent">
+
+    <!-- 1. SERVICE BOOKINGS TAB -->
+    <div class="tab-pane fade show active" id="bookings" role="tabpanel">
+      {% if bookings %}
+        {% for b in bookings %}
+        <div class="bg-white p-4 rounded-4 shadow-sm border mb-4"
+             data-speech-en="Booking for {{ b.service_name }} with {{ b.provider_name }}. Current status is: {{ b.status }}. Scheduled for {{ b.booking_date }} at {{ b.booking_time }}."
+             data-speech-te="{{ b.provider_name }} గారితో {{ b.service_name }} బుకింగ్. ప్రస్తుత స్థితి: {{ b.status }}. తేదీ: {{ b.booking_date }}.">
+          
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+            <div>
+              <span class="badge bg-light text-primary border me-2">Booking #{{ b.booking_id }}</span>
+              <h5 class="fw-bold d-inline text-dark">{{ b.service_name }} &bull; {{ b.provider_name }}</h5>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <button class="btn btn-sm btn-speaker" onclick="readCardAloud(this)" title="Listen to status">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+              <a href="tel:{{ b.provider_phone }}" class="btn btn-sm btn-success fw-bold">
+                <i class="fa-solid fa-phone me-1"></i> Call Provider ({{ b.provider_phone }})
+              </a>
+            </div>
+          </div>
+
+          <!-- VISUAL PROGRESS STEPPER -->
+          <div class="stepper-container">
+            {% set s = b.status %}
+            <div class="step-item {% if s in ['Requested', 'Accepted', 'Provider Assigned', 'On the Way', 'Service Started', 'Completed'] %}completed{% endif %}">
+              <div class="step-icon"><i class="fa-solid fa-file-pen"></i></div>
+              <div class="step-label">Requested</div>
+            </div>
+            <div class="step-item {% if s in ['Accepted', 'Provider Assigned', 'On the Way', 'Service Started', 'Completed'] %}completed{% elif s == 'Requested' %}active{% endif %}">
+              <div class="step-icon"><i class="fa-solid fa-thumbs-up"></i></div>
+              <div class="step-label">Accepted</div>
+            </div>
+            <div class="step-item {% if s in ['On the Way', 'Service Started', 'Completed'] %}completed{% elif s == 'Provider Assigned' %}active{% endif %}">
+              <div class="step-icon"><i class="fa-solid fa-motorcycle"></i></div>
+              <div class="step-label">On the Way</div>
+            </div>
+            <div class="step-item {% if s in ['Service Started', 'Completed'] %}completed{% elif s == 'On the Way' %}active{% endif %}">
+              <div class="step-icon"><i class="fa-solid fa-wrench"></i></div>
+              <div class="step-label">Working</div>
+            </div>
+            <div class="step-item {% if s == 'Completed' %}completed{% elif s == 'Service Started' %}active{% endif %}">
+              <div class="step-icon"><i class="fa-solid fa-check-double"></i></div>
+              <div class="step-label">Completed</div>
+            </div>
+          </div>
+
+          {% if b.status == 'Rejected' %}
+            <div class="alert alert-danger py-2 px-3 small">
+              <i class="fa-solid fa-circle-xmark me-1"></i> This booking request was declined by the provider. Please try other nearby technicians.
+            </div>
+          {% endif %}
+
+          <div class="bg-light p-3 rounded-3 small mb-3">
+            <div class="row g-2">
+              <div class="col-md-4">
+                <b>Scheduled:</b> {{ b.booking_date }} &bull; {{ b.booking_time }}
+              </div>
+              <div class="col-md-4">
+                <b>Problem:</b> {{ b.description }}
+              </div>
+              <div class="col-md-4">
+                <b>Address:</b> {{ b.address }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Rating & Review Form (If Completed and not yet reviewed) -->
+          {% if b.status == 'Completed' %}
+            {% if b.user_rating %}
+              <div class="alert alert-success py-2 px-3 small mb-0 d-flex justify-content-between align-items-center">
+                <span><b>Your Review:</b> "{{ b.user_review }}"</span>
+                <span class="text-warning fw-bold">{% for i in range(b.user_rating) %}★{% endfor %}</span>
+              </div>
+            {% else %}
+              <div class="p-3 bg-white border border-warning rounded-3 mt-3">
+                <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-star text-warning me-1"></i> Rate your service experience:</h6>
+                <form action="{{ url_for('customer.add_review', booking_id=b.booking_id) }}" method="POST" class="d-flex align-items-center gap-2 flex-wrap">
+                  <select name="rating" class="form-select form-select-sm w-auto fw-bold text-warning">
+                    <option value="5">★★★★★ (5 Stars - Excellent)</option>
+                    <option value="4">★★★★☆ (4 Stars - Very Good)</option>
+                    <option value="3">★★★☆☆ (3 Stars - Satisfactory)</option>
+                    <option value="2">★★☆☆☆ (2 Stars - Needs Improvement)</option>
+                    <option value="1">★☆☆☆☆ (1 Star - Poor)</option>
+                  </select>
+                  <input type="text" name="comment" class="form-control form-control-sm flex-grow-1" placeholder="Write feedback (e.g. Arrived on time, fair charges)..." required>
+                  <button type="submit" class="btn btn-sm btn-warning fw-bold">Submit Review</button>
+                </form>
+              </div>
+            {% endif %}
+          {% endif %}
+
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="bg-white p-5 rounded-4 text-center border shadow-sm">
+          <i class="fa-solid fa-calendar-xmark display-4 text-muted mb-3"></i>
+          <h5>No service bookings yet</h5>
+          <p class="text-muted small">Explore local electricians, plumbers, and mechanics near you.</p>
+          <a href="{{ url_for('customer.services_list') }}" class="btn btn-primary fw-bold">Browse Services</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 2. MEDICINE REQUESTS TAB -->
+    <div class="tab-pane fade" id="medreqs" role="tabpanel">
+      {% if medicine_requests %}
+        {% for req in medicine_requests %}
+        <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
+          <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
+            <div>
+              <span class="badge bg-success me-2">Inquiry #{{ req.request_id }}</span>
+              <h5 class="fw-bold d-inline text-dark">{{ req.medicine_name }} {{ req.strength or '' }}</h5>
+              <span class="text-muted ms-2 small">({{ req.quantity }})</span>
+            </div>
+            <span class="badge {% if req.status == 'Responded' %}bg-primary{% else %}bg-warning text-dark{% endif %}">
+              {{ req.status }}
+            </span>
+          </div>
+
+          <div class="small text-muted mb-3">
+            <i class="fa-solid fa-clock me-1"></i> Broadcasted {{ req.created_ago }} &bull; Location: {{ req.address }}
+          </div>
+
+          {% if req.prescription_image %}
+            <div class="mb-3">
+              <span class="small fw-bold text-muted d-block mb-1">Attached Prescription Photo:</span>
+              <a href="{{ url_for('static', filename='uploads/prescriptions/' + req.prescription_image) }}" target="_blank">
+                <img src="{{ url_for('static', filename='uploads/prescriptions/' + req.prescription_image) }}"
+                     alt="Prescription" class="img-thumbnail" style="max-height: 120px;">
+              </a>
+            </div>
+          {% endif %}
+
+          <!-- PHARMACY RESPONSES -->
+          <h6 class="fw-bold text-dark mt-3 mb-2">
+            <i class="fa-solid fa-reply text-success me-1"></i> Responses from Local Pharmacies ({{ req.responses|length }}):
+          </h6>
+          {% if req.responses %}
+            <div class="list-group">
+              {% for resp in req.responses %}
+              <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                  <div class="fw-bold text-dark">{{ resp.pharmacy_name }}</div>
+                  <div class="text-muted small">{{ resp.pharmacy_address }}</div>
+                  {% if resp.notes %}
+                    <div class="text-primary small mt-1"><b>Note from Pharmacist:</b> {{ resp.notes }}</div>
+                  {% endif %}
+                  <div class="text-muted" style="font-size: 0.75rem;">Responded {{ resp.responded_ago }}</div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                  {% if resp.response_status == 'Available' %}
+                    <span class="status-available"><i class="fa-solid fa-check"></i> Available</span>
+                  {% elif resp.response_status == 'Expected Later' %}
+                    <span class="status-low-stock"><i class="fa-solid fa-clock"></i> Expected Later</span>
+                  {% else %}
+                    <span class="status-unavailable"><i class="fa-solid fa-xmark"></i> Not Available</span>
+                  {% endif %}
+
+                  <a href="tel:{{ resp.pharmacy_phone }}" class="btn btn-sm btn-success fw-bold">
+                    <i class="fa-solid fa-phone"></i> Call Store
+                  </a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="alert alert-light border small text-muted mb-0">
+              <i class="fa-solid fa-hourglass-half text-warning me-1"></i>
+              Waiting for nearby pharmacies to check their stock. You will receive updates shortly.
+            </div>
+          {% endif %}
+
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="bg-white p-5 rounded-4 text-center border shadow-sm">
+          <i class="fa-solid fa-prescription-bottle-medical display-4 text-muted mb-3"></i>
+          <h5>No medicine requests submitted</h5>
+          <p class="text-muted small">Can't find your prescribed medicine? Broadcast an inquiry to nearby stores.</p>
+          <a href="{{ url_for('customer.medicine_request') }}" class="btn btn-success fw-bold">Request Medicine</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 3. COMPLAINTS TAB -->
+    <div class="tab-pane fade" id="complaints" role="tabpanel">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="bg-white p-4 rounded-4 shadow-sm border">
+            <h4 class="fw-bold text-danger mb-2">
+              <i class="fa-solid fa-shield-halved me-2"></i> File a Platform Complaint / Report Issue
+            </h4>
+            <p class="text-muted small mb-4">
+              Report fake service providers, overcharging, no-shows, or incorrect pharmacy medicine availability. The community administrator investigates every complaint.
+            </p>
+
+            <form action="{{ url_for('customer.submit_complaint') }}" method="POST">
+              <div class="mb-3">
+                <label class="form-label fw-bold small">Complaint Against</label>
+                <select name="target_type" class="form-select">
+                  <option value="Provider">Service Provider</option>
+                  <option value="Pharmacy">Pharmacy / Medical Store</option>
+                  <option value="Platform">General Platform Issue</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold small">Subject / Title</label>
+                <input type="text" name="title" class="form-control" placeholder="e.g. Electrician did not show up, Wrong medicine reported available" required>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-bold small">Detailed Description</label>
+                <textarea name="description" rows="4" class="form-control" placeholder="Please describe what happened..." required></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-danger fw-bold w-100">
+                <i class="fa-solid fa-paper-plane me-1"></i> Submit Complaint for Admin Investigation
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Local Service Technicians - LOCALServe{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Header & Filter Bar -->
+  <div class="bg-white p-3 p-md-4 rounded-4 shadow-sm border mb-4">
+    <div class="row align-items-center g-3">
+      <div class="col-lg-5">
+        <h3 class="fw-bold mb-1 text-primary">
+          <i class="fa-solid fa-screwdriver-wrench me-2"></i> Find Local Service Providers
+        </h3>
+        <p class="text-muted small mb-0">
+          Showing verified technicians within <b>{{ radius }} km</b> of your current location.
+        </p>
+      </div>
+
+      <!-- Search & Voice Mic -->
+      <div class="col-lg-7">
+        <form action="{{ url_for('customer.services_list') }}" method="GET" id="servicesSearchForm" class="d-flex align-items-center gap-2">
+          <input type="hidden" name="category" value="{{ selected_category }}">
+          <input type="hidden" name="radius" value="{{ radius }}">
+          <input type="hidden" name="lat" value="{{ user_lat }}">
+          <input type="hidden" name="lng" value="{{ user_lng }}">
+
+          <button type="button" class="btn-mic" onclick="startVoiceSearch('serviceSearchInput', 'servicesSearchForm')" title="Speak in Telugu, Hindi or English">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          
+          <input type="text" class="form-control" id="serviceSearchInput" name="q" value="{{ search }}"
+                 placeholder="Search by name, skills or category..." data-i18n="search_placeholder_service">
+
+          <!-- Distance Radius Selector -->
+          <select name="radius" class="form-select w-auto" onchange="document.getElementById('servicesSearchForm').submit()">
+            <option value="5" {% if radius == 5 %}selected{% endif %}>5 km</option>
+            <option value="10" {% if radius == 10 %}selected{% endif %}>10 km</option>
+            <option value="15" {% if radius == 15 %}selected{% endif %}>15 km</option>
+            <option value="25" {% if radius == 25 %}selected{% endif %}>25 km</option>
+            <option value="50" {% if radius == 50 %}selected{% endif %}>50 km</option>
+          </select>
+
+          <button type="submit" class="btn btn-primary fw-bold px-3">
+            <i class="fa-solid fa-filter"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Category Pills -->
+    <div class="d-flex flex-wrap gap-2 mt-3 pt-3 border-top">
+      <a href="{{ url_for('customer.services_list', radius=radius, q=search) }}"
+         class="btn btn-sm {% if not selected_category %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">
+        All Services
+      </a>
+      {% for s in services %}
+      <a href="{{ url_for('customer.services_list', category=s.category, radius=radius, q=search) }}"
+         class="btn btn-sm {% if selected_category == s.category %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">
+        <i class="fa-solid {{ s.icon }} me-1"></i> {{ s.name }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Interactive Leaflet Map -->
+  <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="fw-bold mb-0">
+        <i class="fa-solid fa-map-location-dot text-primary me-2"></i> Nearby Technicians Map
+      </h5>
+      <span class="small text-muted">
+        <i class="fa-solid fa-circle text-primary"></i> You &nbsp;|&nbsp;
+        <i class="fa-solid fa-circle text-warning"></i> Provider
+      </span>
+    </div>
+    <div id="map"></div>
+  </div>
+
+  <!-- Providers Grid -->
+  <div class="row g-4 mb-5">
+    {% if providers %}
+      {% for p in providers %}
+      <div class="col-md-6 col-lg-4">
+        <div class="provider-card p-3 d-flex flex-column justify-content-between"
+             data-speech-en="{{ p.name }}, {{ p.category }}. Located {{ p.distance }} kilometers away. Charges: {{ p.charges_per_hr }} rupees per hour. Rating: {{ p.rating }} stars. Tap green button to call."
+             data-speech-te="{{ p.name }}, {{ p.category }} పనులు. {{ p.distance }} కిలోమీటర్ల దూరం. ఛార్జీ {{ p.charges_per_hr }} రూపాయలు. మాట్లాడేందుకు కాల్ బటన్ నొక్కండి.">
+          <div>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="provider-badge-verified">
+                <i class="fa-solid fa-check-circle"></i> Verified Provider
+              </span>
+              <span class="distance-badge">
+                <i class="fa-solid fa-location-dot text-danger"></i> {{ p.distance }} km away
+              </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="service-icon-box m-0" style="width: 52px; height: 52px; font-size: 1.3rem;">
+                <i class="fa-solid {{ p.icon or 'fa-wrench' }}"></i>
+              </div>
+              <div>
+                <h5 class="fw-bold mb-0 text-dark">{{ p.name }}</h5>
+                <span class="badge bg-light text-primary border">{{ p.category }}</span>
+              </div>
+            </div>
+
+            <p class="text-muted small mb-3">{{ p.bio }}</p>
+
+            <div class="bg-light p-2 rounded small text-muted mb-3 d-flex justify-content-between">
+              <span><i class="fa-solid fa-indian-rupee-sign text-success"></i> <b>₹{{ p.charges_per_hr }}</b>/hr</span>
+              <span><i class="fa-solid fa-briefcase text-secondary"></i> {{ p.experience_years }} yrs exp</span>
+              <span><i class="fa-solid fa-star text-warning"></i> <b>{{ p.rating }}</b> ({{ p.rating_count }})</span>
+            </div>
+            
+            <div class="small text-muted mb-3">
+              <i class="fa-solid fa-map-pin text-danger me-1"></i> {{ p.address }}
+            </div>
+          </div>
+
+          <div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-speaker" onclick="readCardAloud(this)" title="Listen to provider info">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+              <a href="tel:{{ p.phone }}" class="btn btn-sm btn-call flex-grow-1 d-flex align-items-center justify-content-center gap-1">
+                <i class="fa-solid fa-phone"></i> Call
+              </a>
+              <a href="https://wa.me/{{ p.phone|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-whatsapp">
+                <i class="fa-brands fa-whatsapp"></i>
+              </a>
+              <a href="{{ url_for('customer.provider_detail', provider_id=p.provider_id) }}" class="btn btn-sm btn-primary">
+                Book Visit
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12 text-center py-5">
+        <i class="fa-solid fa-magnifying-glass-location display-3 text-muted mb-3"></i>
+        <h4 class="fw-bold text-secondary">No service providers found within {{ radius }} km</h4>
+        <p class="text-muted">Try increasing your search radius or selecting a different service category.</p>
+        <a href="{{ url_for('customer.services_list', radius=50) }}" class="btn btn-primary">
+          Expand Search to 50 km
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const providersData = [
+      {% for p in providers %}
+      {
+        provider_id: {{ p.provider_id }},
+        name: "{{ p.name }}",
+        category: "{{ p.category }}",
+        charges_per_hr: {{ p.charges_per_hr }},
+        phone: "{{ p.phone }}",
+        distance: {{ p.distance }},
+        latitude: {{ p.latitude }},
+        longitude: {{ p.longitude }},
+        icon: "{{ p.icon or 'fa-wrench' }}"
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ];
+
+    initServiceMap('map', {{ user_lat }}, {{ user_lng }}, providersData, []);
+  });
+</script>
+{% endblock %}
