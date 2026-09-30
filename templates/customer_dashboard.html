@@ -35,6 +35,11 @@
       </button>
     </li>
     <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold" id="learning-tab" data-bs-toggle="pill" data-bs-target="#learning" type="button">
+        <i class="fa-solid fa-graduation-cap me-1"></i> My Learning & Certificates ({{ my_courses|length }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
       <button class="nav-link fw-bold" id="complaints-tab" data-bs-toggle="pill" data-bs-target="#complaints" type="button">
         <i class="fa-solid fa-shield-halved me-1"></i> File Complaint / Report
       </button>
@@ -111,6 +116,19 @@
               </div>
             </div>
           </div>
+
+          {% if b.problem_image %}
+          <div class="p-2 mb-3 bg-white rounded border d-flex align-items-center gap-3">
+            <img src="{{ url_for('static', filename='uploads/problems/' + b.problem_image) }}" alt="Problem Photo" class="rounded shadow-sm" style="width: 55px; height: 55px; object-fit: cover;">
+            <div>
+              <span class="badge bg-primary mb-1"><i class="fa-solid fa-camera me-1"></i> Problem Photo Attached</span>
+              <div class="small text-muted">Technician can inspect damaged fixture or leak beforehand.</div>
+            </div>
+            <a href="{{ url_for('static', filename='uploads/problems/' + b.problem_image) }}" target="_blank" class="btn btn-sm btn-outline-secondary ms-auto">
+              <i class="fa-solid fa-expand"></i> View Full
+            </a>
+          </div>
+          {% endif %}
 
           <!-- Rating & Review Form (If Completed and not yet reviewed) -->
           {% if b.status == 'Completed' %}
@@ -269,6 +287,138 @@
             </form>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 4. MY LEARNING & CERTIFICATES TAB -->
+    <div class="tab-pane fade" id="learning" role="tabpanel">
+      <!-- Enrolled Courses -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-bold mb-0 text-primary">
+            <i class="fa-solid fa-book-open-reader me-2"></i> My Enrolled Vocational Courses ({{ my_courses|length }})
+          </h4>
+          <a href="{{ url_for('skillshare.courses_list') }}" class="btn btn-sm btn-outline-primary fw-bold">
+            <i class="fa-solid fa-plus me-1"></i> Explore More Courses
+          </a>
+        </div>
+
+        {% if my_courses %}
+          <div class="row g-3">
+            {% for c in my_courses %}
+            <div class="col-md-6">
+              <div class="border rounded-4 p-3 bg-light h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <span class="badge bg-warning text-dark fw-bold mb-1">{{ c.category_name }}</span>
+                    <h5 class="fw-bold text-dark mb-0">{{ c.course_title }}</h5>
+                    <small class="text-muted">Mentor: <strong>{{ c.mentor_name }}</strong></small>
+                  </div>
+                  <span class="badge {% if c.status == 'Completed' %}bg-success{% else %}bg-primary{% endif %}">
+                    {{ c.status }}
+                  </span>
+                </div>
+
+                <div class="my-2">
+                  <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Progress:</span>
+                    <strong>{{ c.progress }}%</strong>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar {% if c.progress == 100 %}bg-success{% else %}bg-primary progress-bar-striped progress-bar-animated{% endif %}" style="width: {{ c.progress }}%;"></div>
+                  </div>
+                </div>
+
+                {% if c.verification_code %}
+                <div class="p-2 bg-success-subtle border border-success-subtle rounded-3 small my-2">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-success"><i class="fa-solid fa-award me-1"></i> Certificate Ready!</span>
+                    <code class="text-dark">{{ c.certificate_number }}</code>
+                  </div>
+                  <div class="mt-2 d-flex gap-2">
+                    <a href="{{ url_for('skillshare.view_certificate', cert_code=c.verification_code) }}" target="_blank" class="btn btn-sm btn-success fw-bold flex-grow-1">
+                      <i class="fa-solid fa-print me-1"></i> View Certificate
+                    </a>
+                    <a href="{{ url_for('skillshare.verify_page', cert_id=c.certificate_number) }}" class="btn btn-sm btn-outline-success">
+                      <i class="fa-solid fa-shield-halved"></i> Verify
+                    </a>
+                  </div>
+                </div>
+                {% endif %}
+
+                <div class="mt-auto pt-2">
+                  <a href="{{ url_for('skillshare.learn', enrollment_id=c.enrollment_id) }}" class="btn btn-primary btn-sm fw-bold w-100 rounded-pill">
+                    {% if c.status == 'Completed' %}Review Course Lessons{% else %}Continue Lessons &rarr;{% endif %}
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-4 bg-light rounded-3">
+            <i class="fa-solid fa-graduation-cap text-muted fs-2 mb-2"></i>
+            <h6 class="fw-bold text-dark">You have not enrolled in any skill courses yet</h6>
+            <p class="text-muted small mb-3">Learn practical repair skills from village master technicians for free.</p>
+            <a href="{{ url_for('skillshare.courses_list') }}" class="btn btn-primary btn-sm fw-bold px-3">Browse Practical Courses</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Registered Community Workshops -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-dark">
+            <i class="fa-solid fa-people-roof text-warning me-2"></i> My Registered Community Workshops
+          </h5>
+          <a href="{{ url_for('skillshare.workshops_list') }}" class="btn btn-sm btn-outline-warning text-dark fw-bold">All Workshops &rarr;</a>
+        </div>
+        {% if my_workshops %}
+          <div class="row g-3">
+            {% for w in my_workshops %}
+            <div class="col-md-6">
+              <div class="border rounded-3 p-3 bg-light">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <strong class="text-primary">{{ w.title }}</strong>
+                  <span class="badge bg-primary">{{ w.date }}</span>
+                </div>
+                <div class="small text-muted mb-2">
+                  <i class="fa-regular fa-clock me-1"></i> {{ w.time }} &bull;
+                  <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ w.location }}
+                </div>
+                <div class="small text-secondary">Mentor: {{ w.mentor_name }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted small mb-0">No workshop registrations yet. Reserve your free seat for upcoming village demonstrations.</p>
+        {% endif %}
+      </div>
+
+      <!-- Active Local Skill Profile -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-info border-4">
+        <h5 class="fw-bold mb-2 text-dark">
+          <i class="fa-solid fa-user-gear text-info me-2"></i> Local Community Skill Profile
+        </h5>
+        <p class="text-secondary small mb-3">
+          When you complete a LOCALServe vocational course, you can activate your certified skill profile to accept small neighborhood repair jobs and earn extra income.
+        </p>
+        {% if my_skill_profiles %}
+          {% for sp in my_skill_profiles %}
+          <div class="p-3 bg-light rounded-3 border mb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+              <div class="fw-bold text-dark">{{ sp.skill_name }}</div>
+              <small class="text-muted">{{ sp.bio }} &bull; Rate: ₹{{ sp.hourly_rate }}/hr</small>
+            </div>
+            <span class="badge bg-success px-3 py-2"><i class="fa-solid fa-circle-check me-1"></i> Certified & Active for Work</span>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="alert alert-info py-2 px-3 small mb-0">
+            <i class="fa-solid fa-info-circle me-1"></i> Complete any practical course to 100% to unlock your official certified skill profile.
+          </div>
+        {% endif %}
       </div>
     </div>
 

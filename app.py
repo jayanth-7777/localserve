@@ -10,6 +10,7 @@ from routes.provider import provider_bp
 from routes.pharmacy import pharmacy_bp
 from routes.admin import admin_bp
 from routes.api import api_bp
+from routes.skillshare import skillshare_bp
 
 def create_app():
     app = Flask(__name__)
@@ -27,6 +28,7 @@ def create_app():
     app.register_blueprint(pharmacy_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(skillshare_bp)
 
     # Teardown database connection
     app.teardown_appcontext(close_db)
@@ -49,9 +51,12 @@ def create_app():
                 unread_notifications = note_row['c']
         
         all_services = query_db("SELECT * FROM services ORDER BY name ASC")
+        all_skills = query_db("SELECT * FROM skill_categories ORDER BY name ASC")
+        
         return dict(
             unread_notifications=unread_notifications,
-            global_services=all_services
+            global_services=all_services,
+            global_skills=all_skills
         )
 
     # 404 Error handler
@@ -64,7 +69,7 @@ def create_app():
 if __name__ == '__main__':
     app = create_app()
     print("==================================================")
-    print("LOCALServe: Hyperlocal Community Platform Running")
+    print("LOCALServe 2.0: Community Services & SkillShare Running")
     print("Access locally at: http://127.0.0.1:5000")
     print("==================================================")
     app.run(debug=True, host='127.0.0.1', port=5000)

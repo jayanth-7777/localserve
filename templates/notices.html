@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Community Notices - Gram Panchayat LOCALServe{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        <i class="fa-solid fa-bullhorn text-warning me-2"></i> Gram Panchayat & Community Notice Board
+      </h2>
+      <p class="text-secondary mb-0">
+        Official public announcements, power outage schedules, water timings, and medical camps.
+      </p>
+    </div>
+    <a href="{{ url_for('customer.volunteers_view') }}" class="btn btn-outline-primary fw-bold">
+      <i class="fa-solid fa-hands-holding-child me-1"></i> Community Volunteers
+    </a>
+  </div>
+
+  <!-- Notices List -->
+  {% if notices %}
+  <div class="row g-3">
+    {% for notice in notices %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-white border-top border-4 {% if notice.priority == 'Urgent' %}border-danger{% elif notice.priority == 'High' %}border-warning{% else %}border-primary{% endif %}">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge {% if notice.priority == 'Urgent' %}bg-danger{% elif notice.priority == 'High' %}bg-warning text-dark{% else %}bg-primary{% endif %} fw-bold">
+            {{ notice.priority }} Priority
+          </span>
+          <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i> {{ notice.date_effective }}</small>
+        </div>
+
+        <h5 class="fw-bold text-dark mb-2">{{ notice.title }}</h5>
+        <p class="text-secondary small mb-3 flex-grow-1">{{ notice.message }}</p>
+
+        <div class="pt-2 border-top d-flex justify-content-between align-items-center text-muted small">
+          <span><i class="fa-solid fa-landmark me-1"></i> {{ notice.posted_by or 'Gram Panchayat Office' }}</span>
+          <span class="badge bg-light text-secondary border">Active Advisory</span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 bg-light rounded-4">
+    <i class="fa-solid fa-bell-slash text-muted fs-1 mb-3"></i>
+    <h4 class="fw-bold">No active community notices today</h4>
+    <p class="text-muted">Everything is running smoothly in your local area.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

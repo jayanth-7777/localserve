@@ -97,6 +97,19 @@
               <div><b>Address:</b> {{ b.address }}</div>
             </div>
 
+            {% if b.problem_image %}
+            <div class="mb-3 p-2 bg-light rounded border d-flex align-items-center gap-2">
+              <img src="{{ url_for('static', filename='uploads/problems/' + b.problem_image) }}" alt="Problem Photo" class="rounded" style="width: 55px; height: 55px; object-fit: cover;">
+              <div class="flex-grow-1">
+                <span class="badge bg-primary mb-1"><i class="fa-solid fa-camera me-1"></i> Problem Photo Uploaded</span>
+                <div class="small text-muted" style="font-size: 0.75rem;">Inspect the damaged switch/pipe/part before accepting.</div>
+              </div>
+              <a href="{{ url_for('static', filename='uploads/problems/' + b.problem_image) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="fa-solid fa-expand"></i> View
+              </a>
+            </div>
+            {% endif %}
+
             <form action="{{ url_for('provider.respond_booking', booking_id=b.booking_id) }}" method="POST" class="d-flex gap-2">
               <button type="submit" name="action" value="accept" class="btn btn-success fw-bold flex-grow-1">
                 <i class="fa-solid fa-check me-1"></i> Accept Booking
@@ -148,6 +161,19 @@
               <div><b>Address:</b> {{ b.address }}</div>
             </div>
 
+            {% if b.problem_image %}
+            <div class="mb-3 p-2 bg-light rounded border d-flex align-items-center gap-2">
+              <img src="{{ url_for('static', filename='uploads/problems/' + b.problem_image) }}" alt="Problem Photo" class="rounded" style="width: 55px; height: 55px; object-fit: cover;">
+              <div class="flex-grow-1">
+                <span class="badge bg-primary mb-1"><i class="fa-solid fa-camera me-1"></i> Problem Photo</span>
+                <div class="small text-muted" style="font-size: 0.75rem;">Visual preview of customer's issue.</div>
+              </div>
+              <a href="{{ url_for('static', filename='uploads/problems/' + b.problem_image) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="fa-solid fa-expand"></i> View
+              </a>
+            </div>
+            {% endif %}
+
             <!-- Job Lifecycle Status Updater -->
             <form action="{{ url_for('provider.update_status', booking_id=b.booking_id) }}" method="POST" class="d-flex align-items-center gap-2">
               <span class="small fw-bold text-muted text-nowrap">Update Stage:</span>
@@ -172,7 +198,7 @@
   </div>
 
   <!-- 3. REVIEWS & RATINGS HISTORY -->
-  <div>
+  <div class="mb-5">
     <h4 class="fw-bold text-dark mb-3">
       <i class="fa-solid fa-star text-warning me-2"></i> Customer Feedback & Reviews
     </h4>
@@ -196,5 +222,340 @@
     </div>
   </div>
 
+  <!-- 4. SKILL MENTOR CENTER -->
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <div>
+        <h4 class="fw-bold text-dark mb-0">
+          <i class="fa-solid fa-chalkboard-user text-primary me-2"></i> Skill Mentor Center
+        </h4>
+        <small class="text-muted">Teach practical vocational skills to community youth & issue course certificates</small>
+      </div>
+      {% if mentor %}
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#createCourseModal">
+          <i class="fa-solid fa-plus me-1"></i> Publish New Course
+        </button>
+        <button class="btn btn-outline-warning text-dark btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#createWorkshopModal">
+          <i class="fa-solid fa-calendar-plus me-1"></i> Schedule Workshop
+        </button>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if mentor %}
+      <!-- Mentor Status Card -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4 border-start border-warning border-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <span class="badge bg-warning text-dark fw-bold mb-1">Active Skill Mentor</span>
+            <h5 class="fw-bold text-dark mb-1">{{ provider.name }} &bull; Master Instructor</h5>
+            <small class="text-muted">Teaching: {{ mentor.languages or 'Telugu, English' }} &bull; Mode: {{ mentor.teaching_mode or 'In-Person & Workshop' }}</small>
+          </div>
+          <div class="text-md-end">
+            <div class="display-6 fw-bold text-primary">{{ stats.learners_taught or 0 }}</div>
+            <small class="text-muted fw-bold">Community Learners Enrolled</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Published Courses -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+        <h5 class="fw-bold text-dark mb-3">
+          <i class="fa-solid fa-book-bookmark text-success me-2"></i> My Published Courses ({{ mentor_courses|length }})
+        </h5>
+        {% if mentor_courses %}
+          <div class="row g-3">
+            {% for c in mentor_courses %}
+            <div class="col-md-6">
+              <div class="border rounded-4 p-3 bg-light h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <span class="badge bg-primary mb-1">{{ c.category_name }}</span>
+                    <h5 class="fw-bold text-dark mb-0">{{ c.title }}</h5>
+                    <small class="text-muted">{{ c.duration }} &bull; Level: {{ c.level }}</small>
+                  </div>
+                  <span class="badge bg-success">{{ c.enrolled_count or 0 }} Learners</span>
+                </div>
+                <p class="text-secondary small mb-3 flex-grow-1">{{ c.description }}</p>
+                <div class="d-flex gap-2">
+                  <a href="{{ url_for('skillshare.course_detail', course_id=c.course_id) }}" class="btn btn-outline-primary btn-sm fw-bold flex-grow-1">
+                    View Course
+                  </a>
+                  <button class="btn btn-warning btn-sm fw-bold text-dark" data-bs-toggle="modal" data-bs-target="#addLessonModal{{ c.course_id }}">
+                    <i class="fa-solid fa-plus me-1"></i> Add Lesson
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Lesson Modal for this course -->
+            <div class="modal fade" id="addLessonModal{{ c.course_id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content rounded-4 border-0 shadow">
+                  <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-plus-circle me-1"></i> Add Lesson to: {{ c.title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <form action="{{ url_for('provider.add_lesson', course_id=c.course_id) }}" method="POST">
+                    <div class="modal-body p-4">
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Lesson Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Lesson 4: Fan Regulator Wiring" required>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Short Summary</label>
+                        <input type="text" name="description" class="form-control" placeholder="Brief overview of what the learner will do">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Step-by-Step Instructions</label>
+                        <textarea name="content" class="form-control" rows="4" placeholder="Step 1: Disconnect power...&#10;Step 2: Connect red wire to terminal...&#10;Step 3: Test with screwdriver..." required></textarea>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label fw-bold text-danger">
+                          <i class="fa-solid fa-triangle-exclamation"></i> Mandatory Safety Warning
+                        </label>
+                        <input type="text" name="safety_warning" class="form-control border-danger" placeholder="e.g. Ensure main power breaker is turned off and wear rubber slippers." required>
+                        <div class="form-text small text-danger">Safety instructions are mandatory for all vocational repair lessons.</div>
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-md-8">
+                          <label class="form-label fw-bold small">Video Walkthrough URL (Optional)</label>
+                          <input type="url" name="video_url" class="form-control" placeholder="https://youtube.com/...">
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label fw-bold small">Step Order Number</label>
+                          <input type="number" name="lesson_order" class="form-control" value="4" min="1">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-warning fw-bold text-dark px-4">Publish Lesson</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-4 bg-light rounded-3 text-muted">
+            <i class="fa-solid fa-book-open fs-2 mb-2 d-block"></i>
+            You haven't created any courses yet.
+            <div class="mt-2">
+              <button class="btn btn-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#createCourseModal">
+                Create First Course
+              </button>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Scheduled Community Workshops -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+        <h5 class="fw-bold text-dark mb-3">
+          <i class="fa-solid fa-people-roof text-warning me-2"></i> My Scheduled Workshops ({{ mentor_sessions|length }})
+        </h5>
+        {% if mentor_sessions %}
+          <div class="row g-3">
+            {% for s in mentor_sessions %}
+            <div class="col-md-6">
+              <div class="border rounded-3 p-3 bg-light">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <strong class="text-primary">{{ s.title }}</strong>
+                  <span class="badge bg-primary">{{ s.date }}</span>
+                </div>
+                <div class="small text-muted mb-2">
+                  <i class="fa-regular fa-clock me-1"></i> {{ s.time }} &bull;
+                  <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ s.location }}
+                </div>
+                <span class="badge bg-success">Registrations: {{ s.registered_count or 0 }} / {{ s.capacity }} seats</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted small mb-0">No workshops scheduled yet.</p>
+        {% endif %}
+      </div>
+
+    {% else %}
+      <!-- Opt-In Mentor Card -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-start border-primary border-4">
+        <div class="row align-items-center g-3">
+          <div class="col-lg-8">
+            <span class="badge bg-warning text-dark fw-bold mb-2">NEW FEATURE</span>
+            <h4 class="fw-bold text-dark mb-2">Opt-In as a LOCALServe Skill Mentor</h4>
+            <p class="text-secondary mb-0">
+              Share your practical vocational knowledge with village learners. Publish step-by-step repair guides, conduct local weekend workshops at Gram Panchayat halls, and issue official course completion certificates.
+            </p>
+          </div>
+          <div class="col-lg-4 text-lg-end">
+            <button class="btn btn-primary btn-lg fw-bold px-4 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#optInMentorModal">
+              <i class="fa-solid fa-graduation-cap me-1"></i> Enable Mentor Mode
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
 </div>
+
+<!-- Modal: Create Course -->
+<div class="modal fade" id="createCourseModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold"><i class="fa-solid fa-book-medical me-2"></i> Publish Practical Vocational Course</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{{ url_for('provider.create_course') }}" method="POST">
+        <div class="modal-body p-4">
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold">Course Title</label>
+              <input type="text" name="title" class="form-control" placeholder="e.g. Master Single-Phase House Wiring & Switchboard Safety" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Skill Category</label>
+              <select name="skill_id" class="form-select" required>
+                {% for sc in skill_categories %}
+                  <option value="{{ sc.skill_id }}">{{ sc.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Course Description & Outcomes</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="What practical repair skills will the learner gain upon finishing this course?" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-danger">
+              <i class="fa-solid fa-triangle-exclamation"></i> Course Safety Requirements & Rules
+            </label>
+            <textarea name="safety_instructions" class="form-control border-danger" rows="2" placeholder="e.g. Wear dry rubber slippers, disconnect mains breaker, do not touch bare wires without a tester." required></textarea>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-bold small">Difficulty Level</label>
+              <select name="level" class="form-select">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold small">Duration</label>
+              <input type="text" name="duration" class="form-control" placeholder="e.g. 2 Days / 4 Hours" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold small">Course Fee (₹)</label>
+              <input type="number" name="fee" class="form-control" value="0.0" step="10">
+              <div class="form-text small">Enter 0 for Free community training.</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary fw-bold px-4">Publish Course</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Schedule Workshop -->
+<div class="modal fade" id="createWorkshopModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title fw-bold"><i class="fa-solid fa-people-roof me-2"></i> Schedule Community Workshop</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{{ url_for('provider.create_session') }}" method="POST">
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Workshop Title</label>
+            <input type="text" name="title" class="form-control" placeholder="e.g. Live Hands-on Fan & Motor Repair Demonstration" required>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-bold small">Date</label>
+              <input type="date" name="date" class="form-control" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold small">Time</label>
+              <input type="text" name="time" class="form-control" value="10:00 AM - 1:00 PM" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Location / Venue</label>
+            <input type="text" name="location" class="form-control" value="Gram Panchayat Hall" required>
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label fw-bold small">Max Participant Capacity</label>
+              <input type="number" name="capacity" class="form-control" value="20" min="5">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold small">Fee (₹)</label>
+              <input type="number" name="fee" class="form-control" value="0.0">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning fw-bold text-dark px-4">Schedule Session</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Opt-in Mentor -->
+<div class="modal fade" id="optInMentorModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold"><i class="fa-solid fa-graduation-cap me-2"></i> Join as Skill Mentor</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{{ url_for('provider.toggle_mentor_mode') }}" method="POST">
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Years of Practical Trade Experience</label>
+            <input type="number" name="experience_years" class="form-control" value="{{ provider.experience_years or 5 }}" min="1">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Mentor Bio / Training Background</label>
+            <textarea name="bio" class="form-control" rows="3" placeholder="Tell local learners about your trade experience and what you will teach."></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Languages You Can Instruct In</label>
+            <input type="text" name="languages" class="form-control" value="Telugu, Hindi, English">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Preferred Teaching Mode</label>
+            <select name="teaching_mode" class="form-select">
+              <option value="Hands-on In-Person">Hands-on In-Person</option>
+              <option value="Village Workshops">Village Workshops</option>
+              <option value="Hybrid (App Guides & Workshop)">Hybrid (App Guides & Workshop)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary fw-bold px-4">Enable Mentor Mode</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

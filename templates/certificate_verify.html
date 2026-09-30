@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Certificate - LOCALServe SkillShare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+      <div class="card border-0 shadow rounded-4 p-4 p-md-5 text-center">
+        <div class="mb-3">
+          <div class="bg-primary-subtle text-primary p-3 rounded-circle d-inline-flex fs-1 mb-2">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3 class="fw-bold mb-1">Verify Course Certificate</h3>
+          <p class="text-secondary small">
+            Authenticate genuine course completion certificates issued to local community learners.
+          </p>
+        </div>
+
+        <form action="{{ url_for('skillshare.verify_page') }}" method="GET" class="mb-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-start d-block">Certificate Number or Verification Code</label>
+            <input type="text" name="cert_id" class="form-control form-control-lg text-center font-monospace" placeholder="e.g. LS-ELE-2026-00128" required autofocus>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">
+            <i class="fa-solid fa-magnifying-glass me-2"></i> Verify Authenticity
+          </button>
+        </form>
+
+        <div class="p-3 bg-light rounded-3 text-start small border">
+          <div class="fw-bold text-dark mb-1"><i class="fa-solid fa-flask text-warning me-1"></i> Demo Verifiable Sample:</div>
+          <p class="text-muted mb-2">Click to verify the pre-seeded learner certificate:</p>
+          <a href="{{ url_for('skillshare.certificate_view', cert_code='LS-ELE-2026-00128') }}" class="btn btn-sm btn-outline-success font-monospace w-100 text-start">
+            <i class="fa-solid fa-certificate me-1"></i> LS-ELE-2026-00128 (Venkata Rao - Electrical Repair)
+          </a>
+        </div>
+
+        <div class="mt-4 text-center">
+          <a href="{{ url_for('skillshare.courses_list') }}" class="text-decoration-none small text-muted">
+            &larr; Return to SkillShare Courses
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

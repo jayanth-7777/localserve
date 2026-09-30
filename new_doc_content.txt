@@ -1,0 +1,232 @@
+LOCALServe – SkillShare Extension
+Implementation Plan: Hyperlocal Services, Medicine Access, Skill Sharing and Community Empowerment
+1. Project Overview
+LOCALServe is a hyperlocal community platform that connects residents with nearby verified service providers such as electricians, plumbers, carpenters and mechanics, helps users locate pharmacy-reported medicine availability, and extends the platform with a SkillShare system. Through SkillShare, experienced local service providers can become Skill Mentors and teach practical skills to people in their community.
+The SkillShare extension changes the platform from a service-discovery system into a community empowerment platform. A resident can receive a service, learn how the work is performed, complete a practical course, receive a LOCALServe course-completion certificate, and optionally use the acquired skill to provide local services.
+2. Main Objective
+Connect residents with nearby verified service providers.
+Help users locate pharmacy-reported medicine availability with last-updated timestamps.
+Provide an accessible Gramin Sahayak Mode for rural communities and users with limited digital literacy.
+Allow skilled service providers to teach practical skills to local learners.
+Create a learning-to-opportunity pathway from local training to local service participation.
+Support community skill exchange where users can both teach and learn.
+3. SkillShare Concept
+The core workflow is:
+Resident → Finds Local Expert → Requests Service or Training → Learns Skill → Completes Training → Receives Certificate → Optionally Offers Local Services
+A provider can enable a Skill Mentor profile in addition to their normal service-provider profile. For example, a verified electrician may provide electrical repair services and also teach basic fan repair, switch replacement and electrical safety.
+4. Major SkillShare Features
+4.1 Skill Mentor Profiles
+Verified service providers can opt into teaching.
+Mentor profile contains practical experience, teaching languages, teaching mode and skills taught.
+Teaching modes can include in-person, online and community workshop.
+Mentors can specify whether training is free, paid or offered as a community-service activity.
+4.2 Skill Categories
+Initial categories can include:
+Electrical – fan repair, basic wiring, switch and socket work, electrical safety.
+Plumbing – tap repair, pipe fitting and leakage repair.
+Two-wheeler mechanics – basic maintenance and puncture repair.
+Carpentry – furniture repair and basic woodworking.
+Home services – cleaning and maintenance skills.
+Digital skills – basic computer and smartphone skills.
+Food skills – cooking and baking.
+Agricultural skills – selected basic farming and equipment-maintenance skills.
+4.3 Courses and Lessons
+Mentors can create beginner, intermediate or advanced practical courses.
+Each course can contain multiple lessons.
+Lessons can contain text, images, short videos and safety instructions.
+Course pages display duration, number of sessions, language, mode and fee.
+4.4 Learner Dashboard
+Users can enroll in courses.
+Dashboard displays enrolled courses and progress.
+Completed lessons are tracked.
+Completion date is recorded.
+Completed courses can generate a LOCALServe course-completion certificate.
+4.5 Community Training Sessions
+Mentors can organize group workshops.
+Sessions contain date, time, location, capacity and available seats.
+Learners can register for a session.
+Community halls or other approved local venues can be used.
+4.6 Skill-to-Opportunity Pathway
+After completing a course, a user may optionally activate a skill profile:
+Learn → Complete → Build Skill Profile → Become Available for Local Work → Help Other Residents
+The platform should describe the certificate as a LOCALServe course-completion certificate and should not represent it as a government or professionally accredited qualification unless an appropriate accreditation exists.
+4.7 Skill Exchange
+Users can optionally list skills they can teach and skills they want to learn. The system can identify simple skill-exchange opportunities, for example one user teaching basic computer skills while learning basic electrical skills.
+4.8 Voice-Based Learning
+Users can speak a skill requirement in Telugu, Hindi or English.
+Speech-to-text converts the request into a search query.
+Matching skill categories and mentors are displayed.
+Text-to-speech can read course and mentor information aloud.
+4.9 Community Skill Map
+The map can display nearby Skill Mentors, training sessions and service providers using different visual markers. Users can select a mentor to view skills, distance, availability and training options.
+4.10 Community Recognition
+Instead of ranking mentors as simply 'best', the system can show factual contribution statistics such as courses conducted, learners who completed courses and workshops conducted.
+5. User Roles and Capabilities
+5.1 Customer / Learner
+Search nearby services and pharmacies.
+Use Gramin Sahayak Mode.
+Find Skill Mentors and courses.
+Enroll in courses and workshops.
+Track learning progress.
+Download or view LOCALServe completion certificates.
+Optionally create a skill profile after training.
+5.2 Service Provider / Skill Mentor
+Maintain provider profile and service availability.
+Accept service bookings.
+Enable Skill Mentor mode.
+Create courses and lessons.
+Conduct individual or group training.
+Manage learner enrollments.
+Record course completion.
+5.3 Pharmacy
+Maintain pharmacy profile.
+Update medicine availability and timestamps.
+Respond to medicine requests.
+Participate in the local service and community ecosystem.
+5.4 Administrator
+Verify providers, pharmacies and mentors.
+Moderate courses and uploaded learning material.
+Manage complaints and reports.
+Monitor platform statistics.
+Manage skill categories.
+Verify or suspend inappropriate mentor/course content.
+6. Database Extension
+skill_categories
+Fields: skill_id, name, description, icon, telugu_name, hindi_name
+mentor_profiles
+Fields: mentor_id, provider_id, bio, experience_years, teaching_mode, languages, verification_status
+courses
+Fields: course_id, mentor_id, skill_id, title, description, level, duration, fee, mode, location, created_at
+course_lessons
+Fields: lesson_id, course_id, title, description, video_url, image_url, lesson_order
+enrollments
+Fields: enrollment_id, course_id, user_id, status, progress, enrolled_at, completed_at
+skill_certificates
+Fields: certificate_id, enrollment_id, certificate_number, issued_at, verification_code
+training_sessions
+Fields: session_id, course_id, mentor_id, date, time, location, capacity, available_seats, status
+session_registrations
+Fields: registration_id, session_id, user_id, status, registered_at
+7. Relationship Model
+Provider → Mentor Profile → Courses → Course Lessons
+User → Enrollments → Course → Mentor
+Enrollment → Skill Certificate
+Course → Training Sessions → Session Registrations
+Skill Category → Courses → Mentors
+8. Updated System Architecture
+LOCALServe
+│
+├── Service Discovery
+│   ├── Providers
+│   ├── Bookings
+│   └── Reviews
+│
+├── Medicine Access
+│   ├── Pharmacy Search
+│   ├── Inventory Status
+│   └── Medicine Requests
+│
+├── SkillShare
+│   ├── Mentors
+│   ├── Courses
+│   ├── Lessons
+│   ├── Training Sessions
+│   └── Certificates
+│
+├── Rural Accessibility
+│   ├── Voice Search
+│   ├── Text-to-Speech
+│   ├── Multilingual UI
+│   └── Visual Pictograms
+│
+└── Community Layer
+    ├── Skill Exchange
+    ├── Community Workshops
+    └── Local Opportunities
+9. Suggested Project Structure
+csp/
+├── app.py
+├── config.py
+├── database.py
+├── seed_data.py
+├── requirements.txt
+├── routes/
+│   ├── auth.py
+│   ├── customer.py
+│   ├── provider.py
+│   ├── pharmacy.py
+│   ├── mentor.py
+│   ├── learning.py
+│   ├── admin.py
+│   └── api.py
+├── services/
+│   ├── location_service.py
+│   ├── booking_service.py
+│   ├── medicine_service.py
+│   ├── learning_service.py
+│   ├── certificate_service.py
+│   └── notification_service.py
+├── static/
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   └── uploads/
+└── templates/
+    ├── services.html
+    ├── medicines.html
+    ├── mentors.html
+    ├── courses.html
+    ├── course_detail.html
+    ├── learning_dashboard.html
+    ├── training_sessions.html
+    ├── certificate.html
+    └── ...
+10. Implementation Phases
+Phase 1: 
+Project setup, database, authentication and role management.
+Phase 2: 
+Service-provider registration, verification, service categories and provider search.
+Phase 3: 
+GPS/village-based location search, map integration and distance calculation.
+Phase 4: 
+Service booking, provider availability and booking status tracking.
+Phase 5: 
+Pharmacy registration, medicine inventory and pharmacy-reported availability.
+Phase 6: 
+Medicine requests, prescription upload, pharmacy responses and notifications.
+Phase 7: 
+Gramin Sahayak Mode: visual UI, multilingual support, voice search and text-to-speech.
+Phase 8: 
+SkillShare: mentor profiles, skill categories, courses, lessons and enrollments.
+Phase 9: 
+Training sessions, learner progress, completion certificates and skill exchange.
+Phase 10: 
+Security, accessibility, testing, deployment and final documentation.
+11. Verification and Testing
+11.1 Functional Testing
+Provider can enable Mentor mode.
+Mentor can create a course.
+Learner can discover a course by category, location or voice.
+Learner can enroll and track progress.
+Mentor can conduct a training session.
+Course completion can generate a certificate.
+Certificate verification code returns the correct certificate record.
+Skill exchange profiles can be created and searched.
+11.2 Accessibility Testing
+Test voice search in English, Telugu and Hindi.
+Test text-to-speech for mentor and course information.
+Test large touch targets and pictograms.
+Test the application when GPS is unavailable.
+Test the system on low-end mobile devices and slower connections.
+11.3 Security Testing
+Role-based authorization for customer, provider, mentor, pharmacy and admin.
+Password hashing and secure sessions.
+Input validation and parameterized database queries.
+Secure handling of uploaded course media and user files.
+Controlled access to private prescription images.
+Protection against unauthorized certificate creation or modification.
+12. Recommended MVP
+To keep implementation manageable, the first version should include service discovery, pharmacy-reported medicine search, medicine requests, rural accessibility, mentor profiles, basic courses, enrollments and completion certificates.
+Advanced features such as AI-based recommendations, automatic skill matching, extensive video hosting, mobile apps and sophisticated analytics can be added after the core system is stable.
+13. Final Project Value
+The final LOCALServe platform combines local service discovery, medicine access, rural accessibility and practical skill development in one system. Its key differentiator is the conversion of local expertise into community learning: a skilled service provider can both solve a resident's problem and teach that resident how to handle similar problems in the future.

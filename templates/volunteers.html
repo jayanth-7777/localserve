@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Community Volunteers - LOCALServe Community Help{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        <i class="fa-solid fa-hands-holding-circle text-primary me-2"></i> Verified Community Volunteers
+      </h2>
+      <p class="text-secondary mb-0">
+        Dedicated neighborhood youth and helpers available for elderly care, medicine delivery, and emergency navigation.
+      </p>
+    </div>
+    <a href="{{ url_for('customer.notices') }}" class="btn btn-outline-warning text-dark fw-bold">
+      <i class="fa-solid fa-bullhorn me-1"></i> Village Notices
+    </a>
+  </div>
+
+  <!-- Volunteers List -->
+  {% if volunteers %}
+  <div class="row g-4">
+    {% for vol in volunteers %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-column">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="bg-success-subtle text-success p-3 rounded-circle fs-3 text-center" style="width: 56px; height: 56px;">
+            <i class="fa-solid fa-hand-holding-heart"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0 text-dark">{{ vol.name }}</h5>
+            <span class="badge bg-success">Verified Community Volunteer</span>
+          </div>
+        </div>
+
+        <div class="p-3 bg-light rounded-3 mb-3 small border">
+          <div class="mb-1">
+            <strong><i class="fa-solid fa-location-crosshairs text-danger me-1"></i> Area / Ward:</strong> {{ vol.area_ward or 'General Village' }}
+          </div>
+          <div class="mb-1">
+            <strong><i class="fa-solid fa-clock text-primary me-1"></i> Available Hours:</strong> {{ vol.available_hours or 'Daytime / Emergency' }}
+          </div>
+          <div>
+            <strong><i class="fa-solid fa-briefcase text-secondary me-1"></i> Supported Tasks:</strong>
+            <span>{{ vol.skills_or_tasks or 'Medicine pickup, elderly assistance, hospital navigation' }}</span>
+          </div>
+        </div>
+
+        <div class="mt-auto pt-2">
+          {% if vol.phone %}
+          <a href="tel:{{ vol.phone }}" class="btn btn-outline-success fw-bold w-100 rounded-pill py-2">
+            <i class="fa-solid fa-phone me-1"></i> Call Volunteer ({{ vol.phone }})
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 bg-light rounded-4">
+    <i class="fa-solid fa-users text-muted fs-1 mb-3"></i>
+    <h4 class="fw-bold">No registered community volunteers at this moment</h4>
+    <p class="text-muted">Volunteer registrations will be posted shortly by the Gram Panchayat.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

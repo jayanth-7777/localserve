@@ -34,7 +34,11 @@ const translations = {
     ratings: "Ratings",
     experience: "Years Experience",
     charges: "Visiting Charges",
-    how_it_works: "How It Works"
+    how_it_works: "How It Works",
+    skillshare: "SkillShare",
+    courses: "Vocational Courses",
+    workshops: "Community Workshops",
+    emergency: "Emergency Help"
   },
   te: {
     app_title: "లోకల్ సర్వ్ - నిత్యావసర సేవలు మరియు మందుల లభ్యత",
@@ -70,7 +74,11 @@ const translations = {
     ratings: "రేటింగ్స్",
     experience: "ఏళ్ల అనుభవం",
     charges: "విజిటింగ్ ఛార్జీలు",
-    how_it_works: "ఇది ఎలా పనిచేస్తుంది"
+    how_it_works: "ఇది ఎలా పనిచేస్తుంది",
+    skillshare: "నైపుణ్యాల శిక్షణ",
+    courses: "వృత్తి విద్యా కోర్సులు",
+    workshops: "గ్రామీణ వర్క్‌షాప్‌లు",
+    emergency: "అత్యవసర సహాయం"
   },
   hi: {
     app_title: "लोकल सर्व - आवश्यक सेवाएं और दवा उपलब्धता",
@@ -106,7 +114,11 @@ const translations = {
     ratings: "रेटिंग",
     experience: "वर्षों का अनुभव",
     charges: "विजिट शुल्क",
-    how_it_works: "यह कैसे काम करता है"
+    how_it_works: "यह कैसे काम करता है",
+    skillshare: "कौशल प्रशिक्षण",
+    courses: "व्यावसायिक पाठ्यक्रम",
+    workshops: "सामुदायिक कार्यशाला",
+    emergency: "आपातकालीन सहायता"
   }
 };
 

@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Certificate of Completion - {{ cert.certificate_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+@media print {
+  body {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .demo-bar, .navbar, .alert, footer, .no-print, .btn, .bg-danger.text-white.py-2 {
+    display: none !important;
+  }
+  .cert-container {
+    box-shadow: none !important;
+    border: 8px double #1a365d !important;
+    margin: 0 auto !important;
+    page-break-inside: avoid;
+    width: 100% !important;
+  }
+}
+
+.cert-frame {
+  background: #ffffff;
+  border: 12px double #1b3a6b;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  position: relative;
+  padding: 40px 50px;
+  background-image: radial-gradient(circle at 50% 50%, rgba(245, 248, 255, 0.6) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+.cert-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16rem;
+  color: rgba(27, 58, 107, 0.03);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cert-header {
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.cert-student-name {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1a365d;
+  border-bottom: 2px solid #b8860b;
+  display: inline-block;
+  padding: 0 40px 5px 40px;
+  margin: 15px 0;
+}
+
+.cert-course-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #0d6efd;
+}
+
+.gold-seal {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe066 0%, #d4af37 70%, #aa8010 100%);
+  border: 3px dashed #7a5a04;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #3e2d00;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  margin: 0 auto;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Action Bar (Hidden in Print) -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 no-print bg-light p-3 rounded-4 shadow-sm">
+    <div>
+      <span class="badge bg-success me-2 px-3 py-2"><i class="fa-solid fa-circle-check"></i> Officially Verified</span>
+      <span class="text-muted small">Certificate ID: <strong>{{ cert.certificate_number }}</strong></span>
+    </div>
+    <div class="d-flex gap-2">
+      <button onclick="window.print()" class="btn btn-primary fw-bold">
+        <i class="fa-solid fa-print me-1"></i> Print / Save as PDF
+      </button>
+      <button onclick="copyCertLink()" class="btn btn-outline-secondary fw-bold" id="copyBtn">
+        <i class="fa-solid fa-share-nodes me-1"></i> Copy Verification Link
+      </button>
+      <a href="{{ url_for('skillshare.index') }}" class="btn btn-outline-dark">
+        SkillShare Hub
+      </a>
+    </div>
+  </div>
+
+  <!-- Printable Certificate Container -->
+  <div class="cert-frame cert-container rounded-3 position-relative text-center my-2">
+    <div class="cert-watermark">
+      <i class="fa-solid fa-award"></i>
+    </div>
+
+    <div class="position-relative" style="z-index: 1;">
+      <!-- Logo & Organization Header -->
+      <div class="mb-3">
+        <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
+          <i class="fa-solid fa-handshake-angle text-warning fs-1"></i>
+          <span class="fs-2 fw-bold text-primary tracking-wide">LOCAL<span class="text-warning">Serve</span></span>
+        </div>
+        <div class="cert-header small fw-bold text-secondary">
+          Hyperlocal Community Vocational SkillShare Program
+        </div>
+      </div>
+
+      <div class="my-4">
+        <div class="text-uppercase text-muted fw-bold small" style="letter-spacing: 3px;">
+          Certificate of Practical Course Completion
+        </div>
+        <p class="text-muted mt-2 mb-0" style="font-size: 1.1rem; font-style: italic;">
+          This official certificate is proudly awarded to
+        </p>
+
+        <!-- Student Name -->
+        <div class="cert-student-name">
+          {{ cert.student_name }}
+        </div>
+
+        <p class="text-secondary mb-1" style="font-size: 1.05rem;">
+          for successfully completing all practical hands-on lessons, safety protocols, and workshop modules in
+        </p>
+
+        <!-- Course Title -->
+        <div class="cert-course-title my-2">
+          {{ cert.course_title }}
+        </div>
+
+        <div class="text-muted small mb-3">
+          Category: <strong>{{ cert.category_name }}</strong> &bull; Level: <strong>{{ cert.level }}</strong> &bull; Duration: <strong>{{ cert.duration }}</strong>
+        </div>
+
+        <p class="text-secondary small mb-4" style="max-width: 650px; margin: 0 auto;">
+          Demonstrated practical competence under the mentorship of Master Technician 
+          <strong>{{ cert.mentor_name }}</strong> ({{ cert.mentor_trade }}).
+        </p>
+      </div>
+
+      <!-- Signatures & Official Seal Grid -->
+      <div class="row align-items-end pt-3 mt-4 border-top">
+        <div class="col-4 text-center">
+          <div class="border-bottom border-dark pb-1 mb-1 fw-bold text-dark font-monospace" style="font-style: italic;">
+            {{ cert.mentor_name }}
+          </div>
+          <small class="text-muted d-block fw-bold">Master Mentor & Technician</small>
+          <small class="text-secondary" style="font-size: 0.75rem;">Verified Community Mentor</small>
+        </div>
+
+        <div class="col-4 text-center">
+          <div class="gold-seal">
+            <i class="fa-solid fa-certificate fs-3"></i>
+            <span style="font-size: 0.65rem; text-transform: uppercase;">LOCALServe<br>CERTIFIED</span>
+          </div>
+        </div>
+
+        <div class="col-4 text-center">
+          <div class="border-bottom border-dark pb-1 mb-1 fw-bold text-dark font-monospace" style="font-style: italic;">
+            Panchayat Officer
+          </div>
+          <small class="text-muted d-block fw-bold">Gram Community Coordinator</small>
+          <small class="text-secondary" style="font-size: 0.75rem;">LOCALServe Platform</small>
+        </div>
+      </div>
+
+      <!-- Verification Footer Details -->
+      <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 text-start small text-muted">
+        <div>
+          <div>Certificate ID: <strong class="text-dark">{{ cert.certificate_number }}</strong></div>
+          <div>Verification Code: <code class="text-primary fw-bold">{{ cert.verification_code }}</code></div>
+        </div>
+        <div class="text-end">
+          <div>Issued Date: <strong class="text-dark">{{ cert.issued_at[:10] if cert.issued_at else '2026-09-30' }}</strong></div>
+          <div>Public Verification: <strong class="text-success">localserve.org/verify/{{ cert.verification_code }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Regulatory Notice -->
+      <div class="mt-3 text-secondary opacity-75" style="font-size: 0.7rem;">
+        * Notice: This certificate validates practical vocational training completed within the LOCALServe Community SkillShare platform. It acknowledges hands-on neighborhood repair and technical readiness and is not an accredited university academic degree.
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyCertLink() {
+  const url = window.location.origin + '/skillshare/verify/{{ cert.verification_code }}';
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.innerHTML = '<i class="fa-solid fa-check text-success me-1"></i> Copied!';
+    setTimeout(() => {
+      btn.innerHTML = '<i class="fa-solid fa-share-nodes me-1"></i> Copy Verification Link';
+    }, 2500);
+  });
+}
+</script>
+{% endblock %}

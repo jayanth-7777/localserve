@@ -181,5 +181,148 @@ class LocalServeTestCase(unittest.TestCase):
         self.assertIn('medicines', mdata)
         self.assertGreater(mdata['count'], 0)
 
+    def test_skillshare_hub_and_courses(self):
+        """Verify SkillShare Hub, course catalog, and syllabus views."""
+        # 1. Hub
+        hub_res = self.client.get('/skillshare/')
+        self.assertEqual(hub_res.status_code, 200)
+        self.assertIn(b'SkillShare', hub_res.data)
+        self.assertIn(b'People Trained', hub_res.data)
+
+        # 2. Courses list
+        c_res = self.client.get('/skillshare/courses')
+        self.assertEqual(c_res.status_code, 200)
+        self.assertIn(b'Household Electrical', c_res.data)
+
+        # 3. Course detail
+        with self.app.app_context():
+            course = query_db("SELECT course_id FROM courses LIMIT 1", one=True)
+            cid = course['course_id']
+
+        cd_res = self.client.get(f'/skillshare/course/{cid}')
+        self.assertEqual(cd_res.status_code, 200)
+        self.assertIn(b'Mandatory Safety Precautions', cd_res.data)
+        self.assertIn(b'Practical Hands-on Syllabus', cd_res.data)
+
+    def test_course_enrollment_and_certificate(self):
+        """Verify learner can enroll, complete lessons, and unlock verifiable certificate."""
+        self.client.get('/quick-login/customer')
+
+        with self.app.app_context():
+            course = query_db("SELECT course_id FROM courses WHERE title LIKE '%Plumbing%'", one=True)
+            cid = course['course_id']
+
+        # Enroll
+        enroll_res = self.client.post(f'/skillshare/course/{cid}/enroll', follow_redirects=True)
+        self.assertEqual(enroll_res.status_code, 200)
+
+        with self.app.app_context():
+            u = query_db("SELECT user_id FROM users WHERE email = 'customer@localserve.com'", one=True)
+            uid = u['user_id']
+            enrollment = query_db("SELECT * FROM enrollments WHERE course_id = ? AND user_id = ?", (cid, uid), one=True)
+            self.assertIsNotNone(enrollment)
+            eid = enrollment['enrollment_id']
+            lessons = query_db("SELECT lesson_id FROM course_lessons WHERE course_id = ?", (cid,))
+
+        # Complete each lesson
+        for l in lessons:
+            comp_res = self.client.post(f'/skillshare/learn/{eid}/lesson/{l["lesson_id"]}/complete', follow_redirects=True)
+            self.assertEqual(comp_res.status_code, 200)
+
+        # Check certificate generated
+        with self.app.app_context():
+            cert = query_db("SELECT * FROM skill_certificates WHERE enrollment_id = ?", (eid,), one=True)
+            self.assertIsNotNone(cert)
+            self.assertTrue(cert['certificate_number'].startswith('LS-PLU-'))
+
+    def test_certificate_public_verification(self):
+        """Verify public lookup and certificate rendering via certificate number and code."""
+        # Check pre-seeded certificate
+        verif_res = self.client.get('/skillshare/verify/ls2026ele777')
+        self.assertEqual(verif_res.status_code, 200)
+        self.assertIn(b'Venkata Rao', verif_res.data)
+        self.assertIn(b'LS-ELE-2026-00128', verif_res.data)
+        self.assertIn(b'Certificate of Practical Course Completion', verif_res.data)
+
+        # Search route
+        lookup_res = self.client.get('/skillshare/verify?cert_id=LS-ELE-2026-00128', follow_redirects=True)
+        self.assertEqual(lookup_res.status_code, 200)
+        self.assertIn(b'Officially Verified', lookup_res.data)
+
+    def test_workshops_and_skill_exchange(self):
+        """Verify community workshops reservation and peer-to-peer barter posting."""
+        self.client.get('/quick-login/customer')
+
+        # Workshop list
+        ws_res = self.client.get('/skillshare/workshops')
+        self.assertEqual(ws_res.status_code, 200)
+        self.assertIn(b'In-Person Community Workshops', ws_res.data)
+
+        # Register for workshop
+        with self.app.app_context():
+            ws = query_db("SELECT session_id FROM training_sessions LIMIT 1", one=True)
+            sid = ws['session_id']
+
+        reg_res = self.client.post(f'/skillshare/session/{sid}/register', follow_redirects=True)
+        self.assertEqual(reg_res.status_code, 200)
+
+        # Post Skill Exchange
+        post_res = self.client.post('/skillshare/exchange/post', data={
+            'teach_skill': 'Two-Wheeler Carburetor Cleaning',
+            'learn_skill': 'Pesticide Spray Machine Maintenance',
+            'notes': 'Available on weekends.'
+        }, follow_redirects=True)
+        self.assertEqual(post_res.status_code, 200)
+
+        with self.app.app_context():
+            ex = query_db("SELECT * FROM skill_exchanges WHERE teach_skill = 'Two-Wheeler Carburetor Cleaning'", one=True)
+            self.assertIsNotNone(ex)
+
+    def test_emergency_mode_and_assistant(self):
+        """Verify Emergency Mode and Smart Assistant NLP intent parser."""
+        # Emergency Mode view
+        em_res = self.client.get('/emergency?problem=electrical')
+        self.assertEqual(em_res.status_code, 200)
+        self.assertIn(b'Community Emergency Mode', em_res.data)
+        self.assertIn(b'Available', em_res.data)
+
+        # Smart Assistant API: Tap leak
+        asst_plumb = self.client.post('/api/assistant', json={'query': 'My tap is leaking water badly'})
+        self.assertEqual(asst_plumb.status_code, 200)
+        data1 = json.loads(asst_plumb.data)
+        self.assertEqual(data1['intent'], 'service')
+        self.assertEqual(data1['category'], 'Plumber')
+
+        # Smart Assistant API: Fan repair
+        asst_elec = self.client.post('/api/assistant', json={'query': 'Ceiling fan capacitor burnt'})
+        self.assertEqual(asst_elec.status_code, 200)
+        data2 = json.loads(asst_elec.data)
+        self.assertEqual(data2['intent'], 'service')
+        self.assertEqual(data2['category'], 'Electrician')
+
+        # Smart Assistant API: Fever medicine
+        asst_med = self.client.post('/api/assistant', json={'query': 'Need paracetamol for fever'})
+        self.assertEqual(asst_med.status_code, 200)
+        data3 = json.loads(asst_med.data)
+        self.assertEqual(data3['intent'], 'medicine')
+
+        # Smart Assistant API: Telugu query
+        asst_te = self.client.post('/api/assistant', json={'query': 'కరెంట్ పోయింది స్విచ్ బోర్డు కాలింది'})
+        self.assertEqual(asst_te.status_code, 200)
+        data4 = json.loads(asst_te.data)
+        self.assertEqual(data4['intent'], 'service')
+        self.assertEqual(data4['category'], 'Electrician')
+
+    def test_notices_and_volunteers(self):
+        """Verify Panchayat Notice Board and Volunteers directory."""
+        notices_res = self.client.get('/notices')
+        self.assertEqual(notices_res.status_code, 200)
+        self.assertIn(b'Panchayat', notices_res.data)
+
+        vols_res = self.client.get('/volunteers')
+        self.assertEqual(vols_res.status_code, 200)
+        self.assertIn(b'Community Volunteers', vols_res.data)
+
 if __name__ == '__main__':
     unittest.main()
+

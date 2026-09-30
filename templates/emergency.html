@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}Emergency Mode - LOCALServe Community Help{% endblock %}
+
+{% block extra_css %}
+<style>
+.emergency-pulse {
+  animation: pulse-red 2s infinite;
+}
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+.btn-emergency-cat {
+  padding: 18px 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.btn-emergency-cat:hover {
+  transform: translateY(-3px);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+  <!-- Emergency Mode Top Hero -->
+  <div class="p-4 rounded-4 bg-danger text-white mb-4 emergency-pulse shadow">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-3">
+        <div class="fs-1 bg-white text-danger rounded-circle p-2 px-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <span class="badge bg-warning text-dark fw-bold mb-1">PRIORITY RESPONSE</span>
+          <h2 class="fw-bold mb-0">🆘 Community Emergency Mode</h2>
+          <p class="mb-0 opacity-90 small">Immediate connection to nearby verified providers marked <strong>🟢 Available Now</strong></p>
+        </div>
+      </div>
+      <div>
+        <a href="tel:108" class="btn btn-warning text-dark fw-bold px-3 py-2 rounded-pill shadow-sm">
+          <i class="fa-solid fa-truck-medical me-1"></i> Medical Emergency: Call 108
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Helplines Strip -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4 bg-dark text-white p-3">
+    <div class="d-flex justify-content-around align-items-center flex-wrap gap-2 text-center small">
+      <div><a href="tel:108" class="text-white text-decoration-none fw-bold"><i class="fa-solid fa-phone text-danger me-1"></i> Ambulance: 108</a></div>
+      <div><a href="tel:100" class="text-white text-decoration-none fw-bold"><i class="fa-solid fa-phone text-warning me-1"></i> Police: 100</a></div>
+      <div><a href="tel:104" class="text-white text-decoration-none fw-bold"><i class="fa-solid fa-phone text-info me-1"></i> Health Helpline: 104</a></div>
+      <div><a href="tel:1912" class="text-white text-decoration-none fw-bold"><i class="fa-solid fa-bolt text-warning me-1"></i> Electricity Breakdown: 1912</a></div>
+    </div>
+  </div>
+
+  <!-- Problem Category Selector -->
+  <div class="mb-4">
+    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-hand-point-right text-primary me-2"></i> Select Your Emergency Issue:</h5>
+    <div class="row g-2">
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('customer.emergency_view', problem='electrical') }}" 
+           class="btn-emergency-cat border {% if problem == 'electrical' %}bg-danger text-white border-danger shadow{% else %}bg-white text-dark{% endif %}">
+          <i class="fa-solid fa-bolt fs-2 text-warning"></i>
+          <span>Electrical Spark / Trip</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('customer.emergency_view', problem='plumbing') }}" 
+           class="btn-emergency-cat border {% if problem == 'plumbing' %}bg-danger text-white border-danger shadow{% else %}bg-white text-dark{% endif %}">
+          <i class="fa-solid fa-faucet-drip fs-2 text-info"></i>
+          <span>Burst Pipe / Leak</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('customer.emergency_view', problem='vehicle') }}" 
+           class="btn-emergency-cat border {% if problem == 'vehicle' %}bg-danger text-white border-danger shadow{% else %}bg-white text-dark{% endif %}">
+          <i class="fa-solid fa-motorcycle fs-2 text-primary"></i>
+          <span>Vehicle Breakdown</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('customer.emergency_view', problem='locksmith') }}" 
+           class="btn-emergency-cat border {% if problem == 'locksmith' %}bg-danger text-white border-danger shadow{% else %}bg-white text-dark{% endif %}">
+          <i class="fa-solid fa-key fs-2 text-success"></i>
+          <span>Locked Out / Lock</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('customer.emergency_view', problem='medicine') }}" 
+           class="btn-emergency-cat border {% if problem == 'medicine' %}bg-danger text-white border-danger shadow{% else %}bg-white text-dark{% endif %}">
+          <i class="fa-solid fa-pills fs-2 text-danger"></i>
+          <span>Urgent Medicine</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('customer.emergency_view', problem='all') }}" 
+           class="btn-emergency-cat border {% if problem == 'all' or not problem %}bg-danger text-white border-danger shadow{% else %}bg-white text-dark{% endif %}">
+          <i class="fa-solid fa-list-check fs-2 text-secondary"></i>
+          <span>All Nearby Providers</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Available Verified Technicians -->
+  {% if problem != 'medicine' %}
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold mb-0 text-dark">
+        <i class="fa-solid fa-user-check text-success me-2"></i> Verified Providers Available Right Now
+      </h4>
+      <span class="badge bg-success-subtle text-success border border-success fw-bold">Live Status: Available</span>
+    </div>
+
+    {% if providers %}
+    <div class="row g-3">
+      {% for p in providers %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-3 bg-white border-start border-success border-4 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <span class="badge bg-primary text-white fw-bold mb-1">{{ p.category }}</span>
+              <h5 class="fw-bold mb-0 text-dark">{{ p.name }}</h5>
+              <div class="text-muted small">
+                <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ p.distance }} km away
+              </div>
+            </div>
+            <span class="badge bg-success py-1 px-2">🟢 Available</span>
+          </div>
+
+          <p class="text-secondary small mb-3 flex-grow-1">
+            <i class="fa-solid fa-map-pin me-1 text-muted"></i> {{ p.address }}<br>
+            <i class="fa-solid fa-shield-halved text-success me-1"></i> Verified &bull; ⭐ {{ p.rating or '5.0' }} ({{ p.rating_count or 0 }} jobs)
+          </p>
+
+          <div class="d-flex gap-2 mt-auto">
+            <a href="tel:{{ p.phone }}" class="btn btn-success fw-bold flex-grow-1 rounded-pill py-2">
+              <i class="fa-solid fa-phone me-1"></i> Call {{ p.phone }}
+            </a>
+            <a href="https://wa.me/{{ p.phone|replace(' ', '')|replace('+', '') }}?text=Emergency%20help%20needed" target="_blank" class="btn btn-outline-success rounded-pill px-3 py-2">
+              <i class="fa-brands fa-whatsapp"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-warning rounded-4 p-4 text-center">
+      <i class="fa-solid fa-triangle-exclamation fs-1 text-warning mb-2"></i>
+      <h5 class="fw-bold">No registered technicians are marked 'Available' in this specific category right now.</h5>
+      <p class="mb-3">Please try selecting 'All Nearby Providers' or call village emergency helplines.</p>
+      <a href="{{ url_for('customer.emergency_view', problem='all') }}" class="btn btn-primary fw-bold">View All Categories</a>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Nearest Verified Pharmacies -->
+  {% if pharmacies %}
+  <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold mb-0 text-dark">
+        <i class="fa-solid fa-prescription text-danger me-2"></i> Nearby Registered Pharmacies
+      </h4>
+      <a href="{{ url_for('customer.medicines_list') }}" class="btn btn-sm btn-outline-danger fw-bold">Search Medicines &rarr;</a>
+    </div>
+
+    <div class="row g-3">
+      {% for ph in pharmacies %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-3 bg-white border-start border-danger border-4">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <span class="badge bg-danger-subtle text-danger fw-bold mb-1">Pharmacy</span>
+              <h5 class="fw-bold mb-0 text-dark">{{ ph.name }}</h5>
+              <div class="text-muted small">
+                <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ ph.distance }} km away
+              </div>
+            </div>
+            <span class="badge bg-success-subtle text-success border border-success">Verified</span>
+          </div>
+
+          <p class="text-secondary small mb-3">
+            <i class="fa-solid fa-map-pin me-1 text-muted"></i> {{ ph.address }}<br>
+            <i class="fa-regular fa-clock me-1 text-muted"></i> Timings: {{ ph.timings or 'Open' }}
+          </p>
+
+          <a href="tel:{{ ph.phone }}" class="btn btn-danger fw-bold w-100 rounded-pill py-2">
+            <i class="fa-solid fa-phone me-1"></i> Call Store ({{ ph.phone }})
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

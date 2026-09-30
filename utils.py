@@ -1,5 +1,6 @@
 import os
 import datetime
+import uuid
 from werkzeug.utils import secure_filename
 from config import Config
 
@@ -46,8 +47,25 @@ def allowed_file(filename):
 def save_prescription(file):
     if file and file.filename and allowed_file(file.filename):
         os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
-        filename = secure_filename(f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}")
+        filename = secure_filename(f"rx_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}")
         filepath = os.path.join(Config.UPLOAD_FOLDER, filename)
         file.save(filepath)
         return filename
     return None
+
+def save_problem_photo(file):
+    if file and file.filename and allowed_file(file.filename):
+        os.makedirs(Config.PROBLEM_UPLOAD_FOLDER, exist_ok=True)
+        filename = secure_filename(f"prob_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}")
+        filepath = os.path.join(Config.PROBLEM_UPLOAD_FOLDER, filename)
+        file.save(filepath)
+        return filename
+    return None
+
+def generate_cert_number(category_code="SKL"):
+    year = datetime.datetime.now().year
+    rand_suffix = uuid.uuid4().hex[:6].upper()
+    return f"LS-{category_code[:3].upper()}-{year}-{rand_suffix}"
+
+def generate_verification_code():
+    return uuid.uuid4().hex[:12].lower()

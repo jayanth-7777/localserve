@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Skill Courses - LOCALServe SkillShare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        <i class="fa-solid fa-graduation-cap text-primary me-2"></i> Practical Vocational Courses
+      </h2>
+      <p class="text-secondary mb-0">
+        Hands-on technical courses designed for quick learning and local community problem solving.
+      </p>
+    </div>
+    <a href="{{ url_for('skillshare.verify_page') }}" class="btn btn-outline-success fw-bold">
+      <i class="fa-solid fa-certificate me-1"></i> Verify a Certificate
+    </a>
+  </div>
+
+  <!-- Search & Filter Bar -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4 p-3 bg-light">
+    <form method="GET" action="{{ url_for('skillshare.courses_list') }}" class="row g-2 align-items-center">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+          <input type="text" name="q" class="form-control" placeholder="Search courses, e.g. wiring, tap leak..." value="{{ search_query }}">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select name="category" class="form-select">
+          <option value="">All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat.category_code }}" {% if selected_category == cat.category_code %}selected{% endif %}>
+              {{ cat.name }} ({{ cat.telugu_name or '' }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="level" class="form-select">
+          <option value="">All Levels</option>
+          <option value="Beginner" {% if selected_level == 'Beginner' %}selected{% endif %}>Beginner</option>
+          <option value="Intermediate" {% if selected_level == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+          <option value="Advanced" {% if selected_level == 'Advanced' %}selected{% endif %}>Advanced</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="fee" class="form-select">
+          <option value="">Fee Type</option>
+          <option value="free" {% if selected_fee == 'free' %}selected{% endif %}>Free Only</option>
+          <option value="paid" {% if selected_fee == 'paid' %}selected{% endif %}>Paid</option>
+        </select>
+      </div>
+      <div class="col-md-1 d-grid">
+        <button type="submit" class="btn btn-primary fw-bold">Filter</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Courses Grid -->
+  {% if courses %}
+    <div class="row g-4">
+      {% for course in courses %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-column hover-lift transition">
+          <div class="bg-primary bg-gradient text-white p-3 d-flex justify-content-between align-items-start">
+            <div>
+              <span class="badge bg-warning text-dark fw-bold mb-1">
+                <i class="fa-solid {{ course.category_icon or 'fa-wrench' }} me-1"></i> {{ course.category_name }}
+              </span>
+              <h5 class="fw-bold mb-0 text-white">{{ course.title }}</h5>
+            </div>
+            <span class="badge bg-light text-dark">{{ course.duration }}</span>
+          </div>
+
+          <div class="card-body p-3 flex-grow-1">
+            <p class="text-secondary small mb-3">{{ course.description }}</p>
+
+            <div class="p-2 bg-light rounded-3 mb-3 small border">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="fa-solid fa-chalkboard-user text-primary"></i>
+                <span class="fw-bold text-dark">{{ course.mentor_name }}</span>
+                <span class="badge bg-success-subtle text-success ms-auto border border-success">Verified Mentor</span>
+              </div>
+              <div class="text-muted text-truncate" style="font-size: 0.75rem;">
+                <i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ course.location or 'Local Garage / Community Hall' }}
+              </div>
+            </div>
+
+            {% if course.safety_instructions %}
+            <div class="alert alert-warning py-1 px-2 rounded-2 small mb-3" style="font-size: 0.78rem;">
+              <i class="fa-solid fa-triangle-exclamation text-danger me-1"></i>
+              <strong>Safety Warning:</strong> {{ course.safety_instructions[:90] }}...
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between align-items-center text-muted small mt-auto">
+              <span><i class="fa-solid fa-layer-group me-1 text-primary"></i> {{ course.lesson_count or 1 }} Lessons</span>
+              {% if course.fee == 0 %}
+                <span class="badge bg-success">Free Community Course</span>
+              {% else %}
+                <span class="badge bg-dark">₹{{ "%.0f"|format(course.fee) }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="card-footer bg-white border-top p-3 pt-0">
+            <a href="{{ url_for('skillshare.course_detail', course_id=course.course_id) }}" class="btn btn-outline-primary w-100 fw-bold rounded-pill">
+              View Syllabus & Enroll &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-5 bg-light rounded-4 shadow-sm">
+      <i class="fa-solid fa-book-open text-muted fs-1 mb-3"></i>
+      <h4 class="fw-bold">No courses match your search criteria</h4>
+      <p class="text-muted">Try clearing filters or search for another practical skill topic.</p>
+      <a href="{{ url_for('skillshare.courses_list') }}" class="btn btn-primary fw-bold px-4">Reset All Filters</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

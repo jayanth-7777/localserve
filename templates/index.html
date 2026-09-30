@@ -44,6 +44,97 @@
     </div>
   </div>
 
+  <!-- 1. 🆘 Community Emergency Mode Trigger -->
+  <div class="mb-4">
+    <a href="{{ url_for('customer.emergency_view') }}" class="btn btn-danger btn-lg w-100 py-3 rounded-4 shadow fw-bold d-flex align-items-center justify-content-center gap-3 text-decoration-none emergency-pulse" style="font-size: 1.25rem; border: 3px solid #ffc107;">
+      <i class="fa-solid fa-triangle-exclamation fs-1 text-warning"></i>
+      <span class="text-uppercase tracking-wider">🆘 I NEED HELP NOW — Community Emergency Mode</span>
+      <span class="badge bg-warning text-dark px-3 py-1 fs-6 d-none d-md-inline">Available Providers 1-Tap Dial</span>
+    </a>
+  </div>
+
+  <!-- 2. 🤖 Smart Service Assistant Quick Bar -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4 p-3 bg-light border-start border-primary border-4">
+    <div class="row align-items-center g-2">
+      <div class="col-md-4 d-flex align-items-center gap-2">
+        <div class="bg-warning text-dark p-2 rounded-circle fs-5 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div>
+          <h6 class="fw-bold mb-0 text-dark">Smart Problem Assistant</h6>
+          <small class="text-muted">Type or speak your problem in Telugu/English</small>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="input-group">
+          <input type="text" class="form-control" id="homeAssistantQuickInput" placeholder="Try: 'My tap is leaking' or 'నా ఫ్యాన్ తిరగట్లేదు' or 'fever medicine'...">
+          <button class="btn btn-primary fw-bold px-4" type="button" onclick="triggerAssistantFromHome()">
+            <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Match Provider
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ⭐ Community Skill & Social Impact Dashboard -->
+  <div class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden">
+    <div class="card-header bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <h5 class="mb-0 fw-bold text-warning">
+          <i class="fa-solid fa-chart-line me-2"></i> LOCALServe Community Skill & Social Impact Dashboard
+        </h5>
+        <small class="text-secondary">Factual verified counters demonstrating grassroots community impact</small>
+      </div>
+      <span class="badge bg-secondary text-white px-3 py-1"><i class="fa-solid fa-circle-check text-success me-1"></i> Live Verified</span>
+    </div>
+    <div class="card-body bg-light p-4">
+      <div class="row g-3 text-center">
+        <div class="col-6 col-md-3 col-lg-auto flex-grow-1">
+          <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+            <div class="display-6 fw-bold text-primary mb-1">{{ impact.people_trained }}+</div>
+            <div class="text-muted small fw-bold"><i class="fa-solid fa-user-graduate me-1 text-primary"></i> People Trained</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-auto flex-grow-1">
+          <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+            <div class="display-6 fw-bold text-success mb-1">{{ impact.courses_completed }}</div>
+            <div class="text-muted small fw-bold"><i class="fa-solid fa-certificate me-1 text-success"></i> Courses Completed</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-auto flex-grow-1">
+          <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+            <div class="display-6 fw-bold text-info mb-1">{{ impact.local_skill_profiles }}</div>
+            <div class="text-muted small fw-bold"><i class="fa-solid fa-user-gear me-1 text-info"></i> New Skill Profiles</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-auto flex-grow-1">
+          <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+            <div class="display-6 fw-bold text-warning mb-1">{{ impact.skill_exchanges }}</div>
+            <div class="text-muted small fw-bold"><i class="fa-solid fa-handshake me-1 text-warning"></i> Skill Exchanges</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-auto flex-grow-1">
+          <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+            <div class="display-6 fw-bold text-purple mb-1" style="color: #6f42c1;">{{ impact.workshops_held }}</div>
+            <div class="text-muted small fw-bold"><i class="fa-solid fa-people-group me-1" style="color: #6f42c1;"></i> Village Workshops</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-auto flex-grow-1">
+          <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+            <div class="display-6 fw-bold text-dark mb-1">{{ impact.services_completed }}+</div>
+            <div class="text-muted small fw-bold"><i class="fa-solid fa-wrench me-1 text-secondary"></i> Services Completed</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-auto flex-grow-1">
+          <div class="bg-white p-3 rounded-3 shadow-sm border h-100">
+            <div class="display-6 fw-bold text-danger mb-1">{{ impact.medicines_resolved }}+</div>
+            <div class="text-muted small fw-bold"><i class="fa-solid fa-pills me-1 text-danger"></i> Medicine Requests Met</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- RURAL QUICK ASSIST SECTION (Pictorial Cards & Voice Support) -->
   <div class="mb-5">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -321,5 +412,112 @@
     </div>
   </div>
 
+  <!-- SkillShare Extension Spotlight Banner -->
+  <div class="p-4 p-md-5 mb-5 rounded-4 bg-dark text-white shadow-sm position-relative overflow-hidden">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-2 fs-6">
+          <i class="fa-solid fa-award"></i> NEW: LOCALServe SkillShare
+        </span>
+        <h2 class="fw-bold mb-2">Learn Real Trade Skills from Village Master Mentors</h2>
+        <p class="text-light opacity-90 mb-3">
+          Master ceiling fan repairs, PVC tap leak fixing, tubeless puncture repair, and digital UPI banking. Complete practical lessons and earn official course completion certificates.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{{ url_for('skillshare.index') }}" class="btn btn-warning fw-bold text-dark px-4 py-2 rounded-pill">
+            <i class="fa-solid fa-graduation-cap me-1"></i> Open SkillShare Hub
+          </a>
+          <a href="{{ url_for('skillshare.courses_list') }}" class="btn btn-outline-light px-4 py-2 rounded-pill">
+            Browse All Courses &rarr;
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 d-none d-lg-block text-center">
+        <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25">
+          <i class="fa-solid fa-certificate display-1 text-warning mb-2"></i>
+          <h5 class="fw-bold mb-1">Verifiable Certificates</h5>
+          <small class="text-light">Instant online verification code for employers and panchayats.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gram Panchayat Notice Board & Community Volunteers -->
+  <div class="row g-4 mb-5">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-warning border-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-bold mb-0 text-dark">
+            <i class="fa-solid fa-bullhorn text-warning me-2"></i> Panchayat Notice Board
+          </h4>
+          <a href="{{ url_for('customer.notices') }}" class="btn btn-sm btn-outline-warning text-dark fw-bold">All Notices &rarr;</a>
+        </div>
+        {% if notices %}
+          <div class="list-group list-group-flush">
+            {% for n in notices %}
+            <div class="list-group-item px-0 py-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <strong class="text-dark">{{ n.title }}</strong>
+                <span class="badge {% if n.priority == 'Urgent' %}bg-danger{% elif n.priority == 'High' %}bg-warning text-dark{% else %}bg-primary{% endif %}">{{ n.priority }}</span>
+              </div>
+              <p class="text-secondary small mb-1">{{ n.message }}</p>
+              <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i> Effective: {{ n.date_effective }}</small>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted small">No active advisories today.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-success border-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-bold mb-0 text-dark">
+            <i class="fa-solid fa-hands-holding-child text-success me-2"></i> Village Volunteers
+          </h4>
+          <a href="{{ url_for('customer.volunteers_view') }}" class="btn btn-sm btn-outline-success fw-bold">View Helpers &rarr;</a>
+        </div>
+        <p class="text-secondary small mb-3">
+          Dedicated neighborhood helpers ready to assist elderly citizens with medicine delivery, government portal navigation, and urgent travel.
+        </p>
+        <div class="p-3 bg-light rounded-3 small border mb-3">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="fa-solid fa-hand-holding-heart text-success fs-5"></i>
+            <span class="fw-bold">Elderly & Emergency Assistance</span>
+          </div>
+          <div class="text-muted">Direct phone assistance with zero agency commission.</div>
+        </div>
+        <a href="{{ url_for('customer.volunteers_view') }}" class="btn btn-success fw-bold w-100 rounded-pill">
+          <i class="fa-solid fa-phone me-1"></i> Contact Local Volunteers
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function triggerAssistantFromHome() {
+  const inputVal = document.getElementById('homeAssistantQuickInput')?.value.trim();
+  const assistantModalEl = document.getElementById('assistantModal');
+  if (assistantModalEl) {
+    const modal = bootstrap.Modal.getInstance(assistantModalEl) || new bootstrap.Modal(assistantModalEl);
+    modal.show();
+    if (inputVal) {
+      setTimeout(() => {
+        const assistantInput = document.getElementById('assistantInput');
+        const assistantSendBtn = document.getElementById('assistantSendBtn');
+        if (assistantInput && assistantSendBtn) {
+          assistantInput.value = inputVal;
+          assistantSendBtn.click();
+        }
+      }, 400);
+    }
+  }
+}
+</script>
 {% endblock %}

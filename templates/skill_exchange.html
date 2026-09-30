@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Skill Barter & Exchange - LOCALServe SkillShare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        <i class="fa-solid fa-handshake text-warning me-2"></i> Community Skill Barter & Exchange
+      </h2>
+      <p class="text-secondary mb-0">
+        Trade your hands-on skills with neighbors without currency. Teach what you know, learn what you need!
+      </p>
+    </div>
+    <button class="btn btn-warning fw-bold text-dark px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#postExchangeModal">
+      <i class="fa-solid fa-plus me-1"></i> Post Skill Exchange
+    </button>
+  </div>
+
+  <!-- Barter Feed -->
+  <div class="row g-4">
+    <!-- Left Column: Proposals List -->
+    <div class="col-lg-8">
+      {% if exchanges %}
+        <div class="row g-3">
+          {% for ex in exchanges %}
+          <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+              <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="bg-primary text-white p-2 rounded-circle fs-5 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                    <i class="fa-solid fa-user"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0 text-dark">{{ ex.user_name }}</h5>
+                    <small class="text-muted"><i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ ex.user_address or 'Local Community Member' }}</small>
+                  </div>
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success px-3 py-1">Active Exchange</span>
+              </div>
+
+              <div class="row g-3 my-2">
+                <div class="col-md-6">
+                  <div class="p-3 bg-success-subtle rounded-3 border border-success-subtle h-100">
+                    <span class="badge bg-success mb-2">Can Teach / Offer</span>
+                    <h6 class="fw-bold text-success-emphasis mb-1">{{ ex.teach_skill }}</h6>
+                    <small class="text-secondary">Will mentor or provide practical guidance</small>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="p-3 bg-warning-subtle rounded-3 border border-warning-subtle h-100">
+                    <span class="badge bg-warning text-dark mb-2">Wants to Learn</span>
+                    <h6 class="fw-bold text-warning-emphasis mb-1">{{ ex.learn_skill }}</h6>
+                    <small class="text-secondary">Looking for neighbor to guide or assist</small>
+                  </div>
+                </div>
+              </div>
+
+              {% if ex.notes %}
+              <p class="text-secondary small mt-2 mb-3">{{ ex.notes }}</p>
+              {% endif %}
+
+              <div class="d-flex justify-content-end align-items-center pt-2 border-top gap-2">
+                {% if ex.user_phone %}
+                <a href="tel:{{ ex.user_phone }}" class="btn btn-sm btn-outline-success fw-bold px-3 rounded-pill">
+                  <i class="fa-solid fa-phone me-1"></i> Call {{ ex.user_name }}
+                </a>
+                <a href="https://wa.me/{{ ex.user_phone|replace(' ', '')|replace('+', '') }}" target="_blank" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">
+                  <i class="fa-brands fa-whatsapp me-1"></i> WhatsApp
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5 bg-light rounded-4">
+          <i class="fa-solid fa-handshake-simple text-muted fs-1 mb-3"></i>
+          <h4 class="fw-bold">No active skill exchange posts yet</h4>
+          <p class="text-muted">Be the first in your village to post what you can teach and what you want to learn!</p>
+          <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#postExchangeModal">
+            Post First Exchange
+          </button>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Right Column: How Skill Barter Works -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-light mb-4">
+        <h5 class="fw-bold text-dark mb-3">
+          <i class="fa-solid fa-circle-question text-primary me-2"></i> How Skill Barter Works
+        </h5>
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="badge bg-primary rounded-circle fs-6 p-2">1</div>
+          <div>
+            <div class="fw-bold">Post What You Know</div>
+            <small class="text-secondary">Whether it is fan wiring, bicycle repair, or sowing tips.</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="badge bg-primary rounded-circle fs-6 p-2">2</div>
+          <div>
+            <div class="fw-bold">State What You Wish to Learn</div>
+            <small class="text-secondary">Such as online bill payments, plumbing washer changes, or smartphone settings.</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-start gap-3">
+          <div class="badge bg-primary rounded-circle fs-6 p-2">3</div>
+          <div>
+            <div class="fw-bold">Meet & Exchange Mutual Help</div>
+            <small class="text-secondary">Zero cash involved — build community solidarity and self-reliance.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary text-white text-center">
+        <i class="fa-solid fa-award fs-1 text-warning mb-2"></i>
+        <h5 class="fw-bold mb-1">Earn Practical Certificates</h5>
+        <p class="small opacity-90 mb-3">Complete verified step-by-step courses taught by local master technicians.</p>
+        <a href="{{ url_for('skillshare.courses_list') }}" class="btn btn-warning fw-bold text-dark w-100 rounded-pill">
+          Explore Courses
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Post Exchange Modal -->
+<div class="modal fade" id="postExchangeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold"><i class="fa-solid fa-handshake me-2"></i> Post Skill Exchange</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{{ url_for('skillshare.post_exchange') }}" method="POST">
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Skill You Can Teach / Offer</label>
+            <input type="text" name="teach_skill" class="form-control" placeholder="e.g. Ceiling Fan Capacitor Replacement, Wood Sanding" required>
+            <div class="form-text small">What practical craft or technique can you guide a neighbor on?</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Skill You Want to Learn</label>
+            <input type="text" name="learn_skill" class="form-control" placeholder="e.g. Smartphone Net Banking & UPI, Bike Carburetor Cleaning" required>
+            <div class="form-text small">What would you like them to teach or help you with in return?</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Additional Notes / Preferred Timing</label>
+            <textarea name="notes" class="form-control" rows="3" placeholder="e.g. Available on Sunday mornings or evenings after 6 PM."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning fw-bold text-dark px-4">Publish Proposal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

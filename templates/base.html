@@ -69,6 +69,39 @@
               <i class="fa-solid fa-file-prescription me-1"></i> <span data-i18n="request_medicine">Request Medicine</span>
             </a>
           </li>
+
+          <!-- SkillShare Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-graduation-cap me-1 text-warning"></i> <span>SkillShare</span>
+            </a>
+            <ul class="dropdown-menu shadow">
+              <li><a class="dropdown-item" href="{{ url_for('skillshare.index') }}"><i class="fa-solid fa-house-chimney me-2 text-primary"></i> SkillShare Hub</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('skillshare.courses_list') }}"><i class="fa-solid fa-book-open-reader me-2 text-primary"></i> Vocational Courses</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('skillshare.workshops_list') }}"><i class="fa-solid fa-people-roof me-2 text-warning"></i> Community Workshops</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('skillshare.skill_exchange_list') }}"><i class="fa-solid fa-handshake me-2 text-success"></i> Skill Barter Board</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{{ url_for('skillshare.verify_page') }}"><i class="fa-solid fa-shield-halved me-2 text-info"></i> Verify Certificate</a></li>
+            </ul>
+          </li>
+
+          <!-- Community Notices & Volunteers -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white small" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-people-group me-1"></i> Community
+            </a>
+            <ul class="dropdown-menu shadow">
+              <li><a class="dropdown-item" href="{{ url_for('customer.notices') }}"><i class="fa-solid fa-bullhorn me-2 text-warning"></i> Panchayat Notices</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('customer.volunteers_view') }}"><i class="fa-solid fa-hands-holding-child me-2 text-success"></i> Village Volunteers</a></li>
+            </ul>
+          </li>
+
+          <!-- Emergency Mode Button -->
+          <li class="nav-item ms-lg-2">
+            <a class="btn btn-sm btn-danger fw-bold rounded-pill px-3 shadow-sm d-flex align-items-center gap-1" href="{{ url_for('customer.emergency_view') }}">
+              <i class="fa-solid fa-triangle-exclamation"></i> <span>🆘 Emergency</span>
+            </a>
+          </li>
         </ul>
 
         <!-- Controls: Language Switcher, Rural Mode Toggle, User Actions -->
@@ -196,12 +229,74 @@
     </div>
   </footer>
 
+  <!-- Floating Smart Service Assistant Button -->
+  <button id="assistantTriggerBtn" class="btn btn-warning text-dark fw-bold rounded-pill shadow-lg d-flex align-items-center gap-2 position-fixed" style="bottom: 25px; right: 25px; z-index: 1040; padding: 12px 20px; border: 2px solid #fff;">
+    <i class="fa-solid fa-robot fs-5"></i>
+    <span class="d-none d-sm-inline">Smart Assistant</span>
+  </button>
+
+  <!-- Smart Service Assistant Modal -->
+  <div class="modal fade" id="assistantModal" tabindex="-1" aria-labelledby="assistantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white">
+          <div class="d-flex align-items-center gap-2">
+            <div class="bg-warning text-dark rounded-circle p-2 fs-5 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div>
+              <h5 class="modal-title fw-bold mb-0" id="assistantModalLabel">LOCALServe Smart Assistant</h5>
+              <small class="opacity-75">Voice & text natural problem matcher</small>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body p-3" id="assistantChatBody" style="min-height: 280px; max-height: 420px; overflow-y: auto;">
+          <!-- Welcome message -->
+          <div class="d-flex align-items-start gap-2 mb-3">
+            <div class="bg-warning text-dark p-2 rounded-circle fs-6 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div class="bg-light border text-dark p-3 rounded-4 shadow-sm" style="max-width: 85%;">
+              <p class="mb-1">Hello! How can I help you today? You can speak or type your problem in English, తెలుగు, or हिंदी.</p>
+              <div class="text-muted small">For example: <em>"My tap is leaking"</em>, <em>"నా ఇంట్లో ఫ్యాన్ తిరగట్లేదు"</em>, or <em>"fever medicine"</em>.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggestion Chips -->
+        <div class="px-3 py-2 bg-light border-top d-flex gap-1 flex-wrap overflow-auto">
+          <button class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2 assistant-chip" data-query="My tap is leaking" style="font-size: 0.75rem;">🚰 Tap leaking</button>
+          <button class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2 assistant-chip" data-query="Ceiling fan not rotating" style="font-size: 0.75rem;">⚡ Fan not working</button>
+          <button class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2 assistant-chip" data-query="Fever paracetamol medicine" style="font-size: 0.75rem;">💊 Fever medicine</button>
+          <button class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2 assistant-chip" data-query="Bike puncture repair" style="font-size: 0.75rem;">🏍️ Bike puncture</button>
+          <button class="btn btn-sm btn-outline-danger rounded-pill py-0 px-2 assistant-chip" data-query="Emergency help now" style="font-size: 0.75rem;">🆘 Emergency</button>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="modal-footer bg-white border-top p-2">
+          <div class="input-group">
+            <button class="btn btn-outline-primary" type="button" id="assistantMicBtn" title="Speak in Telugu/English/Hindi">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+            <input type="text" class="form-control" id="assistantInput" placeholder="Describe problem, e.g. 'pipe burst' or 'paracetamol'...">
+            <button class="btn btn-primary fw-bold" type="button" id="assistantSendBtn">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script src="{{ url_for('static', filename='js/voice_audio.js') }}"></script>
   <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/assistant.js') }}"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   {% block extra_js %}{% endblock %}
 

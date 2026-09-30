@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - LOCALServe SkillShare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('skillshare.index') }}">SkillShare</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('skillshare.courses_list') }}">Courses</a></li>
+      <li class="breadcrumb-item active text-truncate" style="max-width: 300px;">{{ course.title }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Left Column: Course Header, Safety, Syllabus -->
+    <div class="col-lg-8">
+
+      <!-- Course Header Card -->
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="bg-primary text-white p-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-warning text-dark fw-bold">
+              <i class="fa-solid {{ course.category_icon or 'fa-wrench' }} me-1"></i> {{ course.category_name }}
+            </span>
+            <span class="badge bg-white text-dark">{{ course.level }} Level &bull; {{ course.duration }}</span>
+          </div>
+          <h2 class="fw-bold mb-2">{{ course.title }}</h2>
+          <p class="lead mb-0 opacity-90" style="font-size: 1.05rem;">{{ course.description }}</p>
+        </div>
+
+        <div class="card-body p-4">
+          <!-- Critical Safety Alert (Mandatory for vocational repair) -->
+          {% if course.safety_instructions %}
+          <div class="alert alert-danger border-danger-subtle rounded-3 p-3 mb-4 shadow-sm">
+            <div class="d-flex align-items-start gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-danger fs-3 mt-1"></i>
+              <div>
+                <h5 class="alert-heading fw-bold text-danger mb-1">Mandatory Safety Precautions</h5>
+                <p class="mb-0 text-dark" style="font-size: 0.95rem;">
+                  {{ course.safety_instructions }}
+                </p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Syllabus / Lesson List -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4 class="fw-bold mb-0">
+                <i class="fa-solid fa-list-check text-primary me-2"></i> Practical Hands-on Syllabus
+              </h4>
+              <span class="badge bg-light text-muted border">{{ lessons|length }} Practical Modules</span>
+            </div>
+
+            <div class="accordion shadow-sm rounded-3 overflow-hidden" id="syllabusAccordion">
+              {% for lesson in lessons %}
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ lesson.lesson_id }}">
+                  <button class="accordion-button {% if not loop.first %}collapsed{% endif %} fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ lesson.lesson_id }}">
+                    <span class="badge bg-primary-subtle text-primary me-2">Step {{ lesson.lesson_order }}</span>
+                    {{ lesson.title }}
+                  </button>
+                </h2>
+                <div id="collapse{{ lesson.lesson_id }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#syllabusAccordion">
+                  <div class="accordion-body bg-light">
+                    <p class="text-secondary mb-2">{{ lesson.description }}</p>
+                    {% if lesson.safety_warning %}
+                    <div class="p-2 bg-warning-subtle border-start border-warning border-4 rounded-end small text-dark mb-2">
+                      <i class="fa-solid fa-triangle-exclamation text-warning me-1"></i>
+                      <strong>Safety Check:</strong> {{ lesson.safety_warning }}
+                    </div>
+                    {% endif %}
+                    {% if enrollment %}
+                    <a href="{{ url_for('skillshare.learn', enrollment_id=enrollment.enrollment_id, lesson_id=lesson.lesson_id) }}" class="btn btn-sm btn-primary fw-bold">
+                      Open This Lesson &rarr;
+                    </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Course Completion Certificate Banner -->
+          <div class="p-3 bg-light rounded-4 border d-flex align-items-center gap-3">
+            <div class="fs-1 text-warning">
+              <i class="fa-solid fa-award"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">LOCALServe Course Completion Certificate</h6>
+              <p class="text-secondary small mb-0">
+                Complete all {{ lessons|length }} practical lessons to generate your official verifiable Certificate of Completion with a unique verification code.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Enrollment Card & Mentor Bio -->
+    <div class="col-lg-4">
+
+      <!-- Enrollment CTA Box -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 text-center">
+        <div class="mb-3">
+          {% if course.fee == 0 %}
+            <span class="badge bg-success-subtle text-success fs-6 px-3 py-2 border border-success fw-bold">
+              100% Free Community Course
+            </span>
+          {% else %}
+            <h3 class="fw-bold text-dark mb-0">₹{{ "%.0f"|format(course.fee) }}</h3>
+            <small class="text-muted">Community subsidized fee</small>
+          {% endif %}
+        </div>
+
+        {% if enrollment %}
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small fw-bold mb-1">
+              <span>Your Progress</span>
+              <span class="text-primary">{{ enrollment.progress }}%</span>
+            </div>
+            <div class="progress mb-2" style="height: 10px;">
+              <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" style="width: {{ enrollment.progress }}%;"></div>
+            </div>
+            {% if enrollment.status == 'Completed' %}
+              <div class="badge bg-success mb-3 py-2 w-100">
+                <i class="fa-solid fa-check-double me-1"></i> Course Completed!
+              </div>
+            {% endif %}
+          </div>
+          <a href="{{ url_for('skillshare.learn', enrollment_id=enrollment.enrollment_id) }}" class="btn btn-success btn-lg w-100 fw-bold shadow-sm mb-2">
+            <i class="fa-solid fa-play me-2"></i> Continue Learning
+          </a>
+        {% else %}
+          {% if session.get('user_id') %}
+            <form action="{{ url_for('skillshare.enroll_course', course_id=course.course_id) }}" method="POST">
+              <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm mb-2">
+                <i class="fa-solid fa-user-plus me-2"></i> Enroll Now (Free)
+              </button>
+            </form>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}?next={{ request.path }}" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm mb-2">
+              <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Enroll
+            </a>
+          {% endif %}
+        {% endif %}
+
+        <div class="text-muted small">
+          <i class="fa-solid fa-shield-halved text-success me-1"></i> Self-paced practical step-by-step
+        </div>
+      </div>
+
+      <!-- Master Mentor Profile Card -->
+      <div class="card border-0 shadow-sm rounded-4 p-4">
+        <h5 class="fw-bold mb-3 text-dark">
+          <i class="fa-solid fa-chalkboard-user text-primary me-2"></i> Master Mentor Profile
+        </h5>
+
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="bg-primary-subtle text-primary p-3 rounded-circle fs-3 text-center" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-user-tie"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0 text-dark">{{ course.mentor_name }}</h5>
+            <div class="text-muted small">
+              <i class="fa-solid fa-briefcase me-1"></i> {{ course.mentor_exp or 5 }}+ Years Experience
+            </div>
+            <div class="text-warning small">
+              <i class="fa-solid fa-star"></i> {{ course.mentor_rating or '5.0' }} ({{ course.mentor_reviews or 10 }} reviews)
+            </div>
+          </div>
+        </div>
+
+        <p class="text-secondary small mb-3">{{ course.mentor_bio or 'Experienced village technician committed to sharing trade skills with local community learners.' }}</p>
+
+        <div class="p-2 bg-light rounded-3 small mb-3">
+          <div class="mb-1"><strong><i class="fa-solid fa-language me-1 text-primary"></i> Languages:</strong> {{ course.languages or 'Telugu, Hindi, English' }}</div>
+          <div class="mb-1"><strong><i class="fa-solid fa-map-pin me-1 text-danger"></i> Workshop Location:</strong> {{ course.mentor_address or 'Local Village Workshop' }}</div>
+          <div><strong><i class="fa-solid fa-graduation-cap me-1 text-success"></i> Training Mode:</strong> {{ course.teaching_mode or 'Hands-on In-Person' }}</div>
+        </div>
+
+        {% if course.mentor_phone %}
+        <a href="tel:{{ course.mentor_phone }}" class="btn btn-outline-success w-100 fw-bold rounded-pill">
+          <i class="fa-solid fa-phone me-1"></i> Call Mentor ({{ course.mentor_phone }})
+        </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
