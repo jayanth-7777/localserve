@@ -118,11 +118,11 @@
                 <i class="fa-solid fa-location-crosshairs text-danger me-1"></i> Use My GPS Coords
               </button>
             </div>
-            <textarea name="address" class="form-control" rows="2" required placeholder="House No, Village/Town, Nearby Landmark..."></textarea>
+            <textarea name="address" class="form-control" rows="2" required placeholder="House No, Street / Landmark, Gudlavalleru - 521356..."></textarea>
             
-            <input type="hidden" name="latitude" id="regLat" value="17.3850">
-            <input type="hidden" name="longitude" id="regLng" value="78.4867">
-            <div class="small text-muted mt-1" id="coordsDisplay">Default Location: 17.3850, 78.4867</div>
+            <input type="hidden" name="latitude" id="regLat" value="{{ default_lat|default(16.3486) }}">
+            <input type="hidden" name="longitude" id="regLng" value="{{ default_lng|default(81.0442) }}">
+            <div class="small text-muted mt-1" id="coordsDisplay">Default Location: Gudlavalleru ({{ default_lat|default(16.3486) }}, {{ default_lng|default(81.0442) }}) - PIN: {{ community_pincode|default('521356') }}</div>
           </div>
 
           <button type="submit" class="btn btn-primary w-100 fw-bold py-2 fs-6">

@@ -9,14 +9,19 @@
   <div class="p-4 p-md-5 mb-4 rounded-4 bg-primary text-white shadow-sm position-relative overflow-hidden">
     <div class="row align-items-center">
       <div class="col-lg-8">
-        <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-2 fs-6">
-          <i class="fa-solid fa-location-dot"></i> <span data-i18n="tagline">Hyperlocal Community Platform</span>
-        </span>
+        <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+          <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">
+            <i class="fa-solid fa-location-dot text-danger"></i> Gudlavalleru &bull; PIN: 521356
+          </span>
+          <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-2">
+            Krishna District, AP
+          </span>
+        </div>
         <h1 class="display-5 fw-extrabold text-white mb-3">
-          Find Local Services & Check Medicine Availability
+          Find Local Services & Medicine Availability in Gudlavalleru
         </h1>
         <p class="lead mb-4 text-light">
-          Connect directly with verified electricians, plumbers, carpenters, mechanics, and nearby pharmacies reporting available medicines in your village or town.
+          Connect directly with verified electricians, plumbers, carpenters, mechanics, and registered pharmacies in <b>Gudlavalleru</b> and neighboring mandal villages (Dokiparru, Angaluru, Kowtharam, Penjendra).
         </p>
 
         <!-- Search Bar with Big Microphone Button -->
@@ -25,7 +30,7 @@
             <i class="fa-solid fa-microphone fs-5"></i>
           </button>
           <input type="text" class="form-control border-0 fs-5 ps-2" id="heroSearchInput" name="q"
-                 placeholder="Search electrician, plumber, mechanic, medicine..." data-i18n="search_placeholder_service">
+                 placeholder="Search electrician, plumber, mechanic, medicine in Gudlavalleru..." data-i18n="search_placeholder_service">
           <button type="submit" class="btn btn-warning px-4 py-2 fw-bold text-dark rounded-3 fs-6">
             <i class="fa-solid fa-magnifying-glass me-1"></i> Search
           </button>
@@ -36,9 +41,9 @@
       </div>
       <div class="col-lg-4 d-none d-lg-block text-center">
         <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25">
-          <i class="fa-solid fa-house-chimney-medical display-1 text-warning mb-3"></i>
-          <h4 class="text-white fw-bold">Community First</h4>
-          <p class="small text-light mb-0">Bridging rural communities with essential technical skills and healthcare supply info.</p>
+          <i class="fa-solid fa-landmark-flag display-1 text-warning mb-3"></i>
+          <h4 class="text-white fw-bold">Gudlavalleru Gram Panchayat</h4>
+          <p class="small text-light mb-0">Bridging rural citizens, farmers, and students around SRGEC campus with essential community technical skills and medicine supply.</p>
         </div>
       </div>
     </div>
@@ -48,8 +53,8 @@
   <div class="mb-4">
     <a href="{{ url_for('customer.emergency_view') }}" class="btn btn-danger btn-lg w-100 py-3 rounded-4 shadow fw-bold d-flex align-items-center justify-content-center gap-3 text-decoration-none emergency-pulse" style="font-size: 1.25rem; border: 3px solid #ffc107;">
       <i class="fa-solid fa-triangle-exclamation fs-1 text-warning"></i>
-      <span class="text-uppercase tracking-wider">🆘 I NEED HELP NOW — Community Emergency Mode</span>
-      <span class="badge bg-warning text-dark px-3 py-1 fs-6 d-none d-md-inline">Available Providers 1-Tap Dial</span>
+      <span class="text-uppercase tracking-wider">🆘 I NEED HELP NOW — Gudlavalleru Emergency Mode</span>
+      <span class="badge bg-warning text-dark px-3 py-1 fs-6 d-none d-md-inline">Local Technicians 1-Tap Dial</span>
     </a>
   </div>
 
@@ -81,9 +86,9 @@
     <div class="card-header bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
       <div>
         <h5 class="mb-0 fw-bold text-warning">
-          <i class="fa-solid fa-chart-line me-2"></i> LOCALServe Community Skill & Social Impact Dashboard
+          <i class="fa-solid fa-chart-line me-2"></i> LOCALServe Gudlavalleru (521356) Skill & Social Impact Dashboard
         </h5>
-        <small class="text-secondary">Factual verified counters demonstrating grassroots community impact</small>
+        <small class="text-secondary">Factual verified counters demonstrating grassroots community impact across Gudlavalleru Mandal</small>
       </div>
       <span class="badge bg-secondary text-white px-3 py-1"><i class="fa-solid fa-circle-check text-success me-1"></i> Live Verified</span>
     </div>
@@ -448,7 +453,7 @@
       <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-warning border-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="fw-bold mb-0 text-dark">
-            <i class="fa-solid fa-bullhorn text-warning me-2"></i> Panchayat Notice Board
+            <i class="fa-solid fa-bullhorn text-warning me-2"></i> Gudlavalleru Panchayat Notices
           </h4>
           <a href="{{ url_for('customer.notices') }}" class="btn btn-sm btn-outline-warning text-dark fw-bold">All Notices &rarr;</a>
         </div>
@@ -466,7 +471,7 @@
             {% endfor %}
           </div>
         {% else %}
-          <p class="text-muted small">No active advisories today.</p>
+          <p class="text-muted small">No active advisories today in Gudlavalleru.</p>
         {% endif %}
       </div>
     </div>
@@ -475,12 +480,12 @@
       <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-success border-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="fw-bold mb-0 text-dark">
-            <i class="fa-solid fa-hands-holding-child text-success me-2"></i> Village Volunteers
+            <i class="fa-solid fa-hands-holding-child text-success me-2"></i> Gudlavalleru Volunteers
           </h4>
           <a href="{{ url_for('customer.volunteers_view') }}" class="btn btn-sm btn-outline-success fw-bold">View Helpers &rarr;</a>
         </div>
         <p class="text-secondary small mb-3">
-          Dedicated neighborhood helpers ready to assist elderly citizens with medicine delivery, government portal navigation, and urgent travel.
+          Dedicated neighborhood youth in Gudlavalleru ready to assist elderly citizens with medicine delivery, hospital transport, and technical help.
         </p>
         <div class="p-3 bg-light rounded-3 small border mb-3">
           <div class="d-flex align-items-center gap-2 mb-1">

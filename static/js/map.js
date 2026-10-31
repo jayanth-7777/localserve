@@ -4,10 +4,10 @@ function initServiceMap(mapElementId, userLat, userLng, providers, pharmacies) {
   const mapContainer = document.getElementById(mapElementId);
   if (!mapContainer) return;
 
-  const lat = parseFloat(userLat) || 17.3850;
-  const lng = parseFloat(userLng) || 78.4867;
+  const lat = parseFloat(userLat) || 16.3486;
+  const lng = parseFloat(userLng) || 81.0442;
 
-  const map = L.map(mapElementId).setView([lat, lng], 13);
+  const map = L.map(mapElementId).setView([lat, lng], 14);
 
   // OpenStreetMap Tile Layer
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

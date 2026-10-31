@@ -69,8 +69,8 @@ def init_db():
         phone TEXT NOT NULL,
         password_hash TEXT NOT NULL,
         role TEXT NOT NULL CHECK(role IN ('customer', 'provider', 'pharmacy', 'admin')),
-        latitude REAL DEFAULT 17.3850,
-        longitude REAL DEFAULT 78.4867,
+        latitude REAL DEFAULT 16.3486,
+        longitude REAL DEFAULT 81.0442,
         address TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -100,8 +100,8 @@ def init_db():
         charges_per_hr REAL DEFAULT 200.0,
         availability TEXT DEFAULT 'Available' CHECK(availability IN ('Available', 'Busy', 'Offline')),
         verification_status TEXT DEFAULT 'Pending' CHECK(verification_status IN ('Pending', 'Verified', 'Rejected', 'Suspended')),
-        latitude REAL DEFAULT 17.3850,
-        longitude REAL DEFAULT 78.4867,
+        latitude REAL DEFAULT 16.3486,
+        longitude REAL DEFAULT 81.0442,
         address TEXT,
         bio TEXT,
         rating REAL DEFAULT 5.0,
@@ -144,8 +144,8 @@ def init_db():
         name TEXT NOT NULL,
         phone TEXT NOT NULL,
         address TEXT NOT NULL,
-        latitude REAL DEFAULT 17.3850,
-        longitude REAL DEFAULT 78.4867,
+        latitude REAL DEFAULT 16.3486,
+        longitude REAL DEFAULT 81.0442,
         verification_status TEXT DEFAULT 'Verified' CHECK(verification_status IN ('Pending', 'Verified', 'Rejected', 'Suspended')),
         timings TEXT DEFAULT '8:00 AM - 10:00 PM',
         FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE

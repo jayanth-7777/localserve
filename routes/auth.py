@@ -2,6 +2,7 @@ from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import query_db, execute_db
+from config import Config
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -41,8 +42,8 @@ def login():
             session['user_name'] = user['name']
             session['user_email'] = user['email']
             session['user_role'] = user['role']
-            session['user_lat'] = user['latitude'] or 17.3850
-            session['user_lng'] = user['longitude'] or 78.4867
+            session['user_lat'] = user['latitude'] or Config.DEFAULT_LAT
+            session['user_lng'] = user['longitude'] or Config.DEFAULT_LNG
             session['user_phone'] = user['phone']
 
             # If provider, cache provider_id
@@ -94,8 +95,8 @@ def quick_login(role):
         session['user_name'] = user['name']
         session['user_email'] = user['email']
         session['user_role'] = user['role']
-        session['user_lat'] = user['latitude'] or 17.3850
-        session['user_lng'] = user['longitude'] or 78.4867
+        session['user_lat'] = user['latitude'] or Config.DEFAULT_LAT
+        session['user_lng'] = user['longitude'] or Config.DEFAULT_LNG
         session['user_phone'] = user['phone']
 
         if user['role'] == 'provider':
@@ -130,14 +131,14 @@ def register():
         password = request.form.get('password', '')
         role = request.form.get('role', 'customer')
         address = request.form.get('address', '').strip()
-        latitude = request.form.get('latitude', 17.3850)
-        longitude = request.form.get('longitude', 78.4867)
+        latitude = request.form.get('latitude', Config.DEFAULT_LAT)
+        longitude = request.form.get('longitude', Config.DEFAULT_LNG)
 
         try:
-            latitude = float(latitude) if latitude else 17.3850
-            longitude = float(longitude) if longitude else 78.4867
+            latitude = float(latitude) if latitude else Config.DEFAULT_LAT
+            longitude = float(longitude) if longitude else Config.DEFAULT_LNG
         except ValueError:
-            latitude, longitude = 17.3850, 78.4867
+            latitude, longitude = Config.DEFAULT_LAT, Config.DEFAULT_LNG
 
         # Check existing user
         existing = query_db("SELECT user_id FROM users WHERE LOWER(email) = ?", (email,), one=True)

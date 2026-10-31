@@ -34,8 +34,8 @@ class LocalServeTestCase(unittest.TestCase):
 
     def test_haversine_distance(self):
         """Verify Haversine distance calculation."""
-        # Distance between two nearby points in Hyderabad (~1 km apart)
-        dist = haversine(17.3850, 78.4867, 17.3910, 78.4910)
+        # Distance between two nearby points in Gudlavalleru (~0.72 km apart)
+        dist = haversine(16.3486, 81.0442, 16.3540, 81.0480)
         self.assertGreater(dist, 0.5)
         self.assertLess(dist, 2.0)
 
@@ -128,7 +128,7 @@ class LocalServeTestCase(unittest.TestCase):
             'description': 'Ceiling fan burning smell and regulator spark',
             'customer_name': 'Venkata Rao',
             'customer_phone': '+91 9876543210',
-            'address': 'House 4-21, Gandhi Nagar'
+            'address': 'House No. 2-45, Gandhi Bomma Street, Gudlavalleru - 521356'
         }, follow_redirects=True)
         self.assertEqual(book_res.status_code, 200)
 
@@ -168,7 +168,7 @@ class LocalServeTestCase(unittest.TestCase):
     def test_rest_apis(self):
         """Verify REST APIs for nearby providers and medicines."""
         # Nearby providers API
-        api_res = self.client.get('/api/providers/nearby?lat=17.3850&lng=78.4867&radius=20')
+        api_res = self.client.get('/api/providers/nearby?lat=16.3486&lng=81.0442&radius=20')
         self.assertEqual(api_res.status_code, 200)
         data = json.loads(api_res.data)
         self.assertIn('providers', data)

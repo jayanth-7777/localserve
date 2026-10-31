@@ -161,8 +161,8 @@ document.addEventListener('DOMContentLoaded', function () {
     assistantChatBody.appendChild(typingIndicator);
     assistantChatBody.scrollTop = assistantChatBody.scrollHeight;
 
-    const lat = window.userLat || 17.3850;
-    const lng = window.userLng || 78.4867;
+    const lat = window.userLat || 16.3486;
+    const lng = window.userLng || 81.0442;
 
     fetch('/api/assistant', {
       method: 'POST',

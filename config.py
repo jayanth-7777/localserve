@@ -10,7 +10,10 @@ class Config:
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB max upload
     
-    # Community Reference Coordinates (Default: Local Town / Community Center)
-    DEFAULT_LAT = 17.385044
-    DEFAULT_LNG = 78.486671
+    # Community Reference Coordinates (Default: Gudlavalleru, PIN: 521356, Krishna District, AP)
+    DEFAULT_LAT = 16.3486
+    DEFAULT_LNG = 81.0442
     DEFAULT_RADIUS_KM = 15.0
+    LOCATION_NAME = "Gudlavalleru"
+    PINCODE = "521356"
+    DISTRICT = "Krishna District, Andhra Pradesh"

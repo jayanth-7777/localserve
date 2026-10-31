@@ -56,7 +56,12 @@ def create_app():
         return dict(
             unread_notifications=unread_notifications,
             global_services=all_services,
-            global_skills=all_skills
+            global_skills=all_skills,
+            community_name=getattr(Config, 'LOCATION_NAME', 'Gudlavalleru'),
+            community_pincode=getattr(Config, 'PINCODE', '521356'),
+            community_district=getattr(Config, 'DISTRICT', 'Krishna District, Andhra Pradesh'),
+            default_lat=Config.DEFAULT_LAT,
+            default_lng=Config.DEFAULT_LNG
         )
 
     # 404 Error handler

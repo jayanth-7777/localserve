@@ -28,20 +28,20 @@ def seed_database():
     print("Seeding Users...")
     users_data = [
         # Admin
-        ("Admin Officer", "admin@localserve.com", "+91 9999900000", generate_password_hash("admin123"), "admin", 17.3850, 78.4867, "Panchayat Development Office, Main Road"),
+        ("Panchayat Development Officer", "admin@localserve.com", "+91 9999900000", generate_password_hash("admin123"), "admin", 16.3486, 81.0442, "Gudlavalleru Gram Panchayat Office, Main Road, Gudlavalleru - 521356"),
         # Customer
-        ("Venkata Rao", "customer@localserve.com", "+91 9876543210", generate_password_hash("pass123"), "customer", 17.3850, 78.4867, "House No. 4-21, Gandhi Nagar, Near Water Tank"),
+        ("Venkata Rao", "customer@localserve.com", "+91 9876543210", generate_password_hash("pass123"), "customer", 16.3492, 81.0455, "House No. 2-45, Gandhi Bomma Street, Gudlavalleru - 521356"),
         # Providers
-        ("Ramesh Electrician", "ramesh@provider.com", "+91 9848012345", generate_password_hash("pass123"), "provider", 17.3910, 78.4910, "Plot 12, Substation Road, Shanti Nagar"),
-        ("Suresh Plumber", "suresh@provider.com", "+91 9848023456", generate_password_hash("pass123"), "provider", 17.3780, 78.4810, "Shop 3, Bus Stand Complex"),
-        ("Anand Carpenter", "anand@provider.com", "+91 9848034567", generate_password_hash("pass123"), "provider", 17.3895, 78.4750, "Wood Works Lane, Market Yard"),
-        ("Ravi Mechanic", "ravi@provider.com", "+91 9848045678", generate_password_hash("pass123"), "provider", 17.3950, 78.4980, "National Highway Junction Garage"),
-        ("Shiva Tech (Cooler/Fridge)", "shiva@provider.com", "+91 9848056789", generate_password_hash("pass123"), "provider", 17.3800, 78.4930, "Opp. Zilla Parishad High School"),
+        ("Ramesh Electrician", "ramesh@provider.com", "+91 9848012345", generate_password_hash("pass123"), "provider", 16.3540, 81.0480, "Plot 12, Power Substation Road, Gudlavalleru - 521356"),
+        ("Suresh Plumber", "suresh@provider.com", "+91 9848023456", generate_password_hash("pass123"), "provider", 16.3460, 81.0410, "Shop 3, RTC Bus Stand Complex, Gudlavalleru - 521356"),
+        ("Anand Carpenter", "anand@provider.com", "+91 9848034567", generate_password_hash("pass123"), "provider", 16.3475, 81.0430, "Wood Works Lane, Main Bazaar, Gudlavalleru - 521356"),
+        ("Ravi Mechanic", "ravi@provider.com", "+91 9848045678", generate_password_hash("pass123"), "provider", 16.3580, 81.0510, "College Road Junction Auto Garage, Near SRGEC, Gudlavalleru - 521356"),
+        ("Shiva Tech (Cooler/Fridge)", "shiva@provider.com", "+91 9848056789", generate_password_hash("pass123"), "provider", 16.3450, 81.0460, "Opp. ZP High School, Gudlavalleru - 521356"),
         # Pharmacies
-        ("Balaji Medical & General Store", "balaji@pharmacy.com", "+91 9123456780", generate_password_hash("pass123"), "pharmacy", 17.3860, 78.4880, "Main Bazaar Cross Road, Near Community Hospital"),
-        ("Sri Rama Gramin Pharmacy", "srirama@pharmacy.com", "+91 9123456781", generate_password_hash("pass123"), "pharmacy", 17.3790, 78.4790, "Old Post Office Building, Station Road"),
+        ("Balaji Medical & General Store", "balaji@pharmacy.com", "+91 9123456780", generate_password_hash("pass123"), "pharmacy", 16.3470, 81.0425, "RTC Bus Stand Road, Near Community Hospital, Gudlavalleru - 521356"),
+        ("Sri Rama Gramin Pharmacy", "srirama@pharmacy.com", "+91 9123456781", generate_password_hash("pass123"), "pharmacy", 16.3510, 81.0470, "Station Road, Near Gudlavalleru Railway Station, Gudlavalleru - 521356"),
         # Community Volunteer
-        ("Kavitha Volunteer", "kavitha@volunteer.com", "+91 9848088776", generate_password_hash("pass123"), "customer", 17.3840, 78.4850, "Ward 2, Gandhi Nagar")
+        ("Kavitha Volunteer", "kavitha@volunteer.com", "+91 9848088776", generate_password_hash("pass123"), "customer", 16.3505, 81.0460, "College Road & Station Area, Gudlavalleru - 521356")
     ]
 
     cur.executemany("""
@@ -71,11 +71,11 @@ def seed_database():
 
     print("Seeding Providers...")
     providers_data = [
-        (user_map["ramesh@provider.com"], "Electrician", 8, 150.0, "Available", "Verified", 17.3910, 78.4910, "Plot 12, Substation Road", "Certified electrician with 8 years experience in house wiring and farm pump starters.", 4.9, 38, 86, 2),
-        (user_map["suresh@provider.com"], "Plumber", 5, 140.0, "Available", "Verified", 17.3780, 78.4810, "Shop 3, Bus Stand Complex", "Quick plumbing repairs, drainage clearance and submersible motor fitting.", 4.8, 25, 54, 2),
-        (user_map["anand@provider.com"], "Carpenter", 10, 200.0, "Busy", "Verified", 17.3895, 78.4750, "Wood Works Lane", "Expert wood artisan for door repairs, cot/almirah making and lock fixes.", 4.7, 19, 32, 3),
-        (user_map["ravi@provider.com"], "Mechanic", 12, 180.0, "Available", "Verified", 17.3950, 78.4980, "Highway Junction", "On-spot puncture repair, tractor hydraulic checks, bike engine troubleshooting.", 4.9, 52, 110, 4),
-        (user_map["shiva@provider.com"], "Appliance Repair", 6, 200.0, "Available", "Verified", 17.3800, 78.4930, "Opp ZP High School", "Refrigerator cooling repair, ceiling fan winding, room cooler setup.", 4.6, 14, 28, 1),
+        (user_map["ramesh@provider.com"], "Electrician", 8, 150.0, "Available", "Verified", 16.3540, 81.0480, "Plot 12, Power Substation Road, Gudlavalleru", "Certified electrician with 8 years experience in house wiring, motor starters and farm borewell electricals across Gudlavalleru Mandal.", 4.9, 38, 86, 2),
+        (user_map["suresh@provider.com"], "Plumber", 5, 140.0, "Available", "Verified", 16.3460, 81.0410, "Shop 3, RTC Bus Stand Complex, Gudlavalleru", "Quick plumbing repairs, CPVC line fittings, overhead tank cleaning and submersible motor connections in Gudlavalleru.", 4.8, 25, 54, 2),
+        (user_map["anand@provider.com"], "Carpenter", 10, 200.0, "Busy", "Verified", 16.3475, 81.0430, "Wood Works Lane, Main Bazaar, Gudlavalleru", "Expert wood artisan for teakwood doors, lock replacement, almirah repairs and window frames in Gudlavalleru.", 4.7, 19, 32, 3),
+        (user_map["ravi@provider.com"], "Mechanic", 12, 180.0, "Available", "Verified", 16.3580, 81.0510, "College Road Junction Garage, Near SRGEC, Gudlavalleru", "On-spot puncture repair, tractor hydraulic checks, two-wheeler engine tuning near SRGEC campus.", 4.9, 52, 110, 4),
+        (user_map["shiva@provider.com"], "Appliance Repair", 6, 200.0, "Available", "Verified", 16.3450, 81.0460, "Opp. ZP High School, Gudlavalleru", "Refrigerator gas charging, cooler fan repair, ceiling fan winding and washing machine servicing in Gudlavalleru.", 4.6, 14, 28, 1),
     ]
 
     cur.executemany("""
@@ -85,8 +85,8 @@ def seed_database():
 
     print("Seeding Pharmacies...")
     pharmacies_data = [
-        (user_map["balaji@pharmacy.com"], "Balaji Medical & General Store", "+91 9123456780", "Main Bazaar Cross Road, Near Community Hospital", 17.3860, 78.4880, "Verified", "7:30 AM - 10:30 PM"),
-        (user_map["srirama@pharmacy.com"], "Sri Rama Gramin Pharmacy", "+91 9123456781", "Old Post Office Building, Station Road", 17.3790, 78.4790, "Verified", "8:00 AM - 9:30 PM")
+        (user_map["balaji@pharmacy.com"], "Balaji Medical & General Store", "+91 9123456780", "RTC Bus Stand Road, Near Community Hospital, Gudlavalleru - 521356", 16.3470, 81.0425, "Verified", "7:30 AM - 10:30 PM"),
+        (user_map["srirama@pharmacy.com"], "Sri Rama Gramin Pharmacy", "+91 9123456781", "Station Road, Near Gudlavalleru Railway Station, Gudlavalleru - 521356", 16.3510, 81.0470, "Verified", "8:00 AM - 9:30 PM")
     ]
 
     cur.executemany("""
@@ -157,7 +157,7 @@ def seed_database():
     # Booking 1: Completed with review
     cur.execute("""
     INSERT INTO bookings (user_id, provider_id, service_id, booking_date, booking_time, status, description, customer_name, customer_phone, address, latitude, longitude, created_at)
-    VALUES (?, ?, 1, '2026-09-20', '10:30 AM', 'Completed', 'Motor switch sparking and ceiling fan regulator broken', 'Venkata Rao', '+91 9876543210', 'House No. 4-21, Gandhi Nagar', 17.3850, 78.4867, ?);
+    VALUES (?, ?, 1, '2026-09-20', '10:30 AM', 'Completed', 'Motor switch sparking and ceiling fan regulator broken', 'Venkata Rao', '+91 9876543210', 'House No. 2-45, Gandhi Bomma Street, Gudlavalleru - 521356', 16.3492, 81.0455, ?);
     """, (cust_uid, ramesh_pid, t_yesterday))
     b1_id = cur.lastrowid
 
@@ -169,13 +169,13 @@ def seed_database():
     # Booking 2: Active booking in progress ('On the Way')
     cur.execute("""
     INSERT INTO bookings (user_id, provider_id, service_id, booking_date, booking_time, status, description, customer_name, customer_phone, address, latitude, longitude, created_at)
-    VALUES (?, ?, 2, '2026-09-22', '03:00 PM', 'On the Way', 'Bathroom tap leaking heavily and kitchen drain pipe blocked', 'Venkata Rao', '+91 9876543210', 'House No. 4-21, Gandhi Nagar', 17.3850, 78.4867, ?);
+    VALUES (?, ?, 2, '2026-09-22', '03:00 PM', 'On the Way', 'Bathroom tap leaking heavily and kitchen drain pipe blocked', 'Venkata Rao', '+91 9876543210', 'House No. 2-45, Gandhi Bomma Street, Gudlavalleru - 521356', 16.3492, 81.0455, ?);
     """, (cust_uid, suresh_pid, t_1h))
 
     print("Seeding Sample Medicine Request...")
     cur.execute("""
     INSERT INTO medicine_requests (user_id, medicine_name, strength, quantity, prescription_image, customer_phone, address, latitude, longitude, status, created_at)
-    VALUES (?, 'Insulin Glargine', '100 IU/ml', '2 pens', NULL, '+91 9876543210', 'House 4-21 Gandhi Nagar', 17.3850, 78.4867, 'Responded', ?);
+    VALUES (?, 'Insulin Glargine', '100 IU/ml', '2 pens', NULL, '+91 9876543210', 'House 2-45, Gandhi Bomma Street, Gudlavalleru - 521356', 16.3492, 81.0455, 'Responded', ?);
     """, (cust_uid, t_6h))
     req1_id = cur.lastrowid
 
@@ -301,7 +301,7 @@ def seed_database():
     INSERT INTO courses (mentor_id, skill_id, title, description, level, duration, fee, mode, location, safety_instructions)
     VALUES (?, ?, 'Basic Smartphone & UPI Digital Payments for Daily Life',
             'Empower yourself to use UPI (PhonePe, Google Pay), check electricity bills, and access MeeSeva services.',
-            'Beginner', '1 Day', 0.0, 'In-Person', 'Panchayat Computer Hall',
+            'Beginner', '1 Day', 0.0, 'In-Person', 'Gudlavalleru Gram Panchayat Hall, PIN: 521356',
             'NEVER share your UPI PIN, OTP, or password with anyone, even bank officials.');
     """, (ramesh_mid, skill_map['digital']))
 
@@ -330,22 +330,22 @@ def seed_database():
     # Activate Local Skill Profile for Venkata Rao
     cur.execute("""
     INSERT INTO user_skill_profiles (user_id, skill_name, certificate_id, is_available_for_work, hourly_rate, bio)
-    VALUES (?, 'Household Electrical & Fan Repair', ?, 1, 100.0, 'Certified in basic electrical repairs by LOCALServe SkillShare. Available for evening neighborhood help.');
+    VALUES (?, 'Household Electrical & Fan Repair', ?, 1, 100.0, 'Certified in basic electrical repairs by LOCALServe SkillShare. Available for evening neighborhood repairs in Gudlavalleru.');
     """, (cust_uid, cert1_id))
 
     print("Seeding Community Group Workshops...")
     cur.execute("""
     INSERT INTO training_sessions (course_id, mentor_id, title, date, time, location, capacity, available_seats, fee, status)
     VALUES
-    (?, ?, 'Free Community Electrical Safety & Fan Repair Workshop', '2026-10-05', '10:00 AM - 1:00 PM', 'Panchayat Community Hall, Gudivada', 20, 14, 0.0, 'Scheduled'),
-    (?, ?, 'Practical Water Tap & Pipe Jointing Session', '2026-10-10', '02:00 PM - 5:00 PM', 'Bus Stand Community Workshop', 15, 9, 0.0, 'Scheduled');
+    (?, ?, 'Free Community Electrical Safety & Fan Repair Workshop', '2026-10-05', '10:00 AM - 1:00 PM', 'Gudlavalleru Gram Panchayat Community Hall, PIN: 521356', 20, 14, 0.0, 'Scheduled'),
+    (?, ?, 'Practical Water Tap & Pipe Jointing Session', '2026-10-10', '02:00 PM - 5:00 PM', 'RTC Bus Stand Community Workshop, Gudlavalleru - 521356', 15, 9, 0.0, 'Scheduled');
     """, (c1_id, ramesh_mid, c2_id, suresh_mid))
 
     print("Seeding Community Notices & Volunteers...")
     notices_data = [
-        ("Drinking Water Pipeline Maintenance", "Water Supply", "Panchayat drinking water supply will be paused tomorrow from 10:00 AM to 2:00 PM for overhead tank desilting.", "2026-10-02"),
-        ("Free Eye & General Health Camp", "Health Camp", "Free health checkup, blood sugar testing, and eye consultation by district hospital team at Community Hall this Sunday.", "2026-10-06"),
-        ("Seasonal Farming Sprayer Maintenance", "Agriculture", "Bring manual and battery pesticide sprayers to Market Yard for free nozzle cleanup and pump washer servicing.", "2026-10-08")
+        ("Drinking Water Tank & Pipeline Maintenance", "Water Supply", "Gudlavalleru Gram Panchayat drinking water supply will be paused tomorrow from 10:00 AM to 2:00 PM for overhead tank desilting near Ryves canal.", "2026-10-02"),
+        ("Free Eye & General Health Camp at Gudlavalleru PHC", "Health Camp", "Free health checkup, blood sugar testing, and eye consultation by district hospital medical team at Gudlavalleru Community Hall this Sunday.", "2026-10-06"),
+        ("Agricultural Sprayer & Motor Maintenance Camp", "Agriculture", "Bring manual and battery pesticide sprayers to Gudlavalleru Market Yard / Rythu Seva Kendram for free nozzle cleanup and pump washer servicing.", "2026-10-08")
     ]
     cur.executemany("""
     INSERT INTO community_notices (title, category, content, date_effective)
@@ -355,7 +355,7 @@ def seed_database():
     vol_uid = user_map["kavitha@volunteer.com"]
     cur.execute("""
     INSERT INTO volunteers (user_id, area, phone, skills_assisted)
-    VALUES (?, 'Gandhi Nagar & Substation Area', '+91 9848088776', 'Assisting elderly residents with medicine search and booking verified electricians/plumbers.');
+    VALUES (?, 'College Road, Gandhi Bomma Center & Station Area, Gudlavalleru (521356)', '+91 9848088776', 'Assisting elderly residents with medicine search and booking verified electricians/plumbers across Gudlavalleru Mandal.');
     """, (vol_uid,))
 
     # Peer to Peer Skill Exchange
