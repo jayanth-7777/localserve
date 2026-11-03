@@ -1,4 +1,4 @@
-// LOCALServe 2.0 - Smart Service Assistant
+// SevaSetu - Smart Service Assistant
 // Natural Language & Voice Intent Matching for Hyperlocal Services, Medicines & Skills
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const typingIndicator = document.createElement('div');
     typingIndicator.id = 'assistantTyping';
     typingIndicator.className = 'd-flex align-items-center gap-2 mb-3 text-muted small';
-    typingIndicator.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-primary"></i> <span>LOCALServe Assistant is analyzing...</span>';
+    typingIndicator.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-primary"></i> <span>SevaSetu Assistant is analyzing...</span>';
     assistantChatBody.appendChild(typingIndicator);
     assistantChatBody.scrollTop = assistantChatBody.scrollHeight;
 

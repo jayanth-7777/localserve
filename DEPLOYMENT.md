@@ -1,6 +1,6 @@
-# LOCALServe Public Deployment Guide
+# SevaSetu Public Deployment Guide
 
-This document describes how LOCALServe is deployed for public access.
+This document describes how SevaSetu is deployed for public access.
 
 ---
 
@@ -26,7 +26,7 @@ For a permanent public deployment that stays online 24/7 (even when your laptop 
 ```bash
 git init
 git add .
-git commit -m "Initial commit of LOCALServe platform"
+git commit -m "Initial commit of SevaSetu platform"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/localserve.git
 git push -u origin main

@@ -358,7 +358,7 @@ def init_db():
     );
     """)
 
-    # 19. Skill Certificates (Official LOCALServe Course-Completion Certificate)
+    # 19. Skill Certificates (Official SevaSetu Course-Completion Certificate)
     cur.execute("""
     CREATE TABLE IF NOT EXISTS skill_certificates (
         certificate_id INTEGER PRIMARY KEY AUTOINCREMENT,

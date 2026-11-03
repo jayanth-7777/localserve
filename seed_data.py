@@ -31,17 +31,31 @@ def seed_database():
         ("Panchayat Development Officer", "admin@localserve.com", "+91 9999900000", generate_password_hash("admin123"), "admin", 16.3486, 81.0442, "Gudlavalleru Gram Panchayat Office, Main Road, Gudlavalleru - 521356"),
         # Customer
         ("Venkata Rao", "customer@localserve.com", "+91 9876543210", generate_password_hash("pass123"), "customer", 16.3492, 81.0455, "House No. 2-45, Gandhi Bomma Street, Gudlavalleru - 521356"),
-        # Providers
+        # Gudlavalleru Providers
         ("Ramesh Electrician", "ramesh@provider.com", "+91 9848012345", generate_password_hash("pass123"), "provider", 16.3540, 81.0480, "Plot 12, Power Substation Road, Gudlavalleru - 521356"),
         ("Suresh Plumber", "suresh@provider.com", "+91 9848023456", generate_password_hash("pass123"), "provider", 16.3460, 81.0410, "Shop 3, RTC Bus Stand Complex, Gudlavalleru - 521356"),
         ("Anand Carpenter", "anand@provider.com", "+91 9848034567", generate_password_hash("pass123"), "provider", 16.3475, 81.0430, "Wood Works Lane, Main Bazaar, Gudlavalleru - 521356"),
         ("Ravi Mechanic", "ravi@provider.com", "+91 9848045678", generate_password_hash("pass123"), "provider", 16.3580, 81.0510, "College Road Junction Auto Garage, Near SRGEC, Gudlavalleru - 521356"),
         ("Shiva Tech (Cooler/Fridge)", "shiva@provider.com", "+91 9848056789", generate_password_hash("pass123"), "provider", 16.3450, 81.0460, "Opp. ZP High School, Gudlavalleru - 521356"),
-        # Pharmacies
+        # Gudlavalleru Pharmacies
         ("Balaji Medical & General Store", "balaji@pharmacy.com", "+91 9123456780", generate_password_hash("pass123"), "pharmacy", 16.3470, 81.0425, "RTC Bus Stand Road, Near Community Hospital, Gudlavalleru - 521356"),
         ("Sri Rama Gramin Pharmacy", "srirama@pharmacy.com", "+91 9123456781", generate_password_hash("pass123"), "pharmacy", 16.3510, 81.0470, "Station Road, Near Gudlavalleru Railway Station, Gudlavalleru - 521356"),
-        # Community Volunteer
-        ("Kavitha Volunteer", "kavitha@volunteer.com", "+91 9848088776", generate_password_hash("pass123"), "customer", 16.3505, 81.0460, "College Road & Station Area, Gudlavalleru - 521356")
+        # Gudlavalleru Community Volunteer
+        ("Kavitha Volunteer", "kavitha@volunteer.com", "+91 9848088776", generate_password_hash("pass123"), "customer", 16.3505, 81.0460, "College Road & Station Area, Gudlavalleru - 521356"),
+
+        # Gudivada Providers & Pharmacies (~12 km from Gudlavalleru)
+        ("Kishore Electricals (Gudivada)", "kishore@provider.com", "+91 9848123456", generate_password_hash("pass123"), "provider", 16.4420, 80.9940, "Nehru Chowk, Eluru Road, Gudivada - 521301"),
+        ("Krishna Plumbing & Sanitation (Gudivada)", "krishna@provider.com", "+91 9848134567", generate_password_hash("pass123"), "provider", 16.4380, 80.9910, "RTC Complex Road, Gudivada - 521301"),
+        ("Venkateswara Auto Garage (Gudivada)", "venkat.auto@provider.com", "+91 9848145678", generate_password_hash("pass123"), "provider", 16.4450, 80.9960, "Bhimavaram Bypass Road, Gudivada - 521301"),
+        ("Sri Venkateswara Medicals (Gudivada)", "venkat.med@pharmacy.com", "+91 9123456782", generate_password_hash("pass123"), "pharmacy", 16.4405, 80.9930, "Opp. Government Area Hospital, Gudivada - 521301"),
+        ("Apollo Pharmacy Gudivada", "apollo.gudivada@pharmacy.com", "+91 9123456783", generate_password_hash("pass123"), "pharmacy", 16.4390, 80.9915, "Gowri Shankar Talkies Road, Gudivada - 521301"),
+
+        # Machilipatnam Providers & Pharmacies (~26 km from Gudlavalleru)
+        ("Coastal Cooling & Appliance Care (Machilipatnam)", "coastal@provider.com", "+91 9848212345", generate_password_hash("pass123"), "provider", 16.1890, 81.1400, "Robertsonpet Main Road, Machilipatnam - 521001"),
+        ("Durga Heavy & Two-Wheeler Mechanics (Machilipatnam)", "durga@provider.com", "+91 9848223456", generate_password_hash("pass123"), "provider", 16.1850, 81.1350, "Near Old Bus Stand & Port Road, Machilipatnam - 521001"),
+        ("District Hospital Road Medicals (Machilipatnam)", "dh.med@pharmacy.com", "+91 9123456784", generate_password_hash("pass123"), "pharmacy", 16.1880, 81.1375, "Near District Headquarters Hospital, Machilipatnam - 521001"),
+        ("Sri Satya Sai Pharmacy (Machilipatnam)", "satyasai@pharmacy.com", "+91 9123456785", generate_password_hash("pass123"), "pharmacy", 16.1865, 81.1395, "Koneru Center, Machilipatnam - 521001"),
+        ("Rajesh Volunteer (Machilipatnam)", "rajesh@volunteer.com", "+91 9848299887", generate_password_hash("pass123"), "customer", 16.1870, 81.1380, "Koneru Center & Port Road, Machilipatnam - 521001")
     ]
 
     cur.executemany("""
@@ -71,11 +85,21 @@ def seed_database():
 
     print("Seeding Providers...")
     providers_data = [
+        # Gudlavalleru Providers
         (user_map["ramesh@provider.com"], "Electrician", 8, 150.0, "Available", "Verified", 16.3540, 81.0480, "Plot 12, Power Substation Road, Gudlavalleru", "Certified electrician with 8 years experience in house wiring, motor starters and farm borewell electricals across Gudlavalleru Mandal.", 4.9, 38, 86, 2),
         (user_map["suresh@provider.com"], "Plumber", 5, 140.0, "Available", "Verified", 16.3460, 81.0410, "Shop 3, RTC Bus Stand Complex, Gudlavalleru", "Quick plumbing repairs, CPVC line fittings, overhead tank cleaning and submersible motor connections in Gudlavalleru.", 4.8, 25, 54, 2),
         (user_map["anand@provider.com"], "Carpenter", 10, 200.0, "Busy", "Verified", 16.3475, 81.0430, "Wood Works Lane, Main Bazaar, Gudlavalleru", "Expert wood artisan for teakwood doors, lock replacement, almirah repairs and window frames in Gudlavalleru.", 4.7, 19, 32, 3),
         (user_map["ravi@provider.com"], "Mechanic", 12, 180.0, "Available", "Verified", 16.3580, 81.0510, "College Road Junction Garage, Near SRGEC, Gudlavalleru", "On-spot puncture repair, tractor hydraulic checks, two-wheeler engine tuning near SRGEC campus.", 4.9, 52, 110, 4),
         (user_map["shiva@provider.com"], "Appliance Repair", 6, 200.0, "Available", "Verified", 16.3450, 81.0460, "Opp. ZP High School, Gudlavalleru", "Refrigerator gas charging, cooler fan repair, ceiling fan winding and washing machine servicing in Gudlavalleru.", 4.6, 14, 28, 1),
+        
+        # Gudivada Providers (~12 km)
+        (user_map["kishore@provider.com"], "Electrician", 9, 160.0, "Available", "Verified", 16.4420, 80.9940, "Nehru Chowk, Eluru Road, Gudivada - 521301", "Industrial motor rewinding, commercial shop wiring, and 3-phase pump starters in Gudivada area.", 4.8, 44, 98, 3),
+        (user_map["krishna@provider.com"], "Plumber", 7, 150.0, "Available", "Verified", 16.4380, 80.9910, "RTC Complex Road, Gudivada - 521301", "Sanitary line unclogging, bathroom pipeline fittings, and rooftop overhead tank float valves in Gudivada.", 4.9, 31, 67, 2),
+        (user_map["venkat.auto@provider.com"], "Mechanic", 11, 200.0, "Available", "Verified", 16.4450, 80.9960, "Bhimavaram Bypass Road, Gudivada - 521301", "24/7 highway breakdown assistance, tractor clutch repairs and bike engine servicing in Gudivada.", 4.7, 58, 142, 4),
+
+        # Machilipatnam Providers (~26 km)
+        (user_map["coastal@provider.com"], "Appliance Repair", 10, 220.0, "Available", "Verified", 16.1890, 81.1400, "Robertsonpet Main Road, Machilipatnam - 521001", "Split AC duct cleaning, commercial deep freezer maintenance, and inverter servicing in Machilipatnam.", 4.8, 36, 75, 3),
+        (user_map["durga@provider.com"], "Mechanic", 14, 200.0, "Available", "Verified", 16.1850, 81.1350, "Near Old Bus Stand & Port Road, Machilipatnam - 521001", "Marine boat engine tuning, agricultural tiller servicing, and auto breakdown help in Machilipatnam.", 4.9, 64, 180, 5),
     ]
 
     cur.executemany("""
@@ -85,8 +109,17 @@ def seed_database():
 
     print("Seeding Pharmacies...")
     pharmacies_data = [
+        # Gudlavalleru Pharmacies
         (user_map["balaji@pharmacy.com"], "Balaji Medical & General Store", "+91 9123456780", "RTC Bus Stand Road, Near Community Hospital, Gudlavalleru - 521356", 16.3470, 81.0425, "Verified", "7:30 AM - 10:30 PM"),
-        (user_map["srirama@pharmacy.com"], "Sri Rama Gramin Pharmacy", "+91 9123456781", "Station Road, Near Gudlavalleru Railway Station, Gudlavalleru - 521356", 16.3510, 81.0470, "Verified", "8:00 AM - 9:30 PM")
+        (user_map["srirama@pharmacy.com"], "Sri Rama Gramin Pharmacy", "+91 9123456781", "Station Road, Near Gudlavalleru Railway Station, Gudlavalleru - 521356", 16.3510, 81.0470, "Verified", "8:00 AM - 9:30 PM"),
+        
+        # Gudivada Pharmacies
+        (user_map["venkat.med@pharmacy.com"], "Sri Venkateswara Medicals (Gudivada)", "+91 9123456782", "Opp. Government Area Hospital, Gudivada - 521301", 16.4405, 80.9930, "Verified", "24 Hours Emergency"),
+        (user_map["apollo.gudivada@pharmacy.com"], "Apollo Pharmacy Gudivada", "+91 9123456783", "Gowri Shankar Talkies Road, Gudivada - 521301", 16.4390, 80.9915, "Verified", "7:00 AM - 11:00 PM"),
+
+        # Machilipatnam Pharmacies
+        (user_map["dh.med@pharmacy.com"], "District Hospital Road Medicals (Machilipatnam)", "+91 9123456784", "Near District Headquarters Hospital, Machilipatnam - 521001", 16.1880, 81.1375, "Verified", "24 Hours Emergency"),
+        (user_map["satyasai@pharmacy.com"], "Sri Satya Sai Pharmacy (Machilipatnam)", "+91 9123456785", "Koneru Center, Machilipatnam - 521001", 16.1865, 81.1395, "Verified", "8:00 AM - 10:30 PM")
     ]
 
     cur.executemany("""
@@ -131,17 +164,40 @@ def seed_database():
 
     print("Seeding Medicine Inventory with periodic timestamps...")
     inventory_data = [
+        # Balaji Medical (Gudlavalleru)
         (pharm_map["Balaji Medical & General Store"], med_map["Paracetamol 500mg"], "Available", 20.0, t_10m, "Fresh batch arrived today. Strip of 10."),
         (pharm_map["Balaji Medical & General Store"], med_map["ORS Sachet"], "Available", 22.0, t_25m, "WHO formula orange flavor in stock."),
         (pharm_map["Balaji Medical & General Store"], med_map["Cetirizine 10mg"], "Low Stock", 18.0, t_1h, "Only 3 strips remaining."),
         (pharm_map["Balaji Medical & General Store"], med_map["Cough Syrup DX"], "Available", 85.0, t_10m, "Sugar-free version also available."),
         (pharm_map["Balaji Medical & General Store"], med_map["Pantoprazole 40mg"], "Available", 65.0, t_6h, "Standard strip of 10 tablets."),
         (pharm_map["Balaji Medical & General Store"], med_map["Diclofenac Gel"], "Available", 55.0, t_25m, "Fast-acting topical gel."),
+
+        # Sri Rama Pharmacy (Gudlavalleru)
         (pharm_map["Sri Rama Gramin Pharmacy"], med_map["Paracetamol 500mg"], "Available", 22.0, t_1h, "10-tablet strip."),
         (pharm_map["Sri Rama Gramin Pharmacy"], med_map["Metformin 500mg"], "Available", 42.0, t_6h, "Regular diabetic stock available."),
         (pharm_map["Sri Rama Gramin Pharmacy"], med_map["Dettol Antiseptic Liquid"], "Available", 72.0, t_yesterday, "100ml bottle."),
         (pharm_map["Sri Rama Gramin Pharmacy"], med_map["Amoxicillin 500mg"], "Low Stock", 90.0, t_1h, "Requires valid prescription."),
-        (pharm_map["Sri Rama Gramin Pharmacy"], med_map["Azithromycin 500mg"], "Unavailable", 120.0, t_yesterday, "Out of stock, distributor shipment delayed.")
+        (pharm_map["Sri Rama Gramin Pharmacy"], med_map["Azithromycin 500mg"], "Unavailable", 120.0, t_yesterday, "Out of stock, distributor shipment delayed."),
+
+        # Sri Venkateswara Medicals (Gudivada)
+        (pharm_map["Sri Venkateswara Medicals (Gudivada)"], med_map["Paracetamol 500mg"], "Available", 20.0, t_10m, "24-hour emergency stock ready."),
+        (pharm_map["Sri Venkateswara Medicals (Gudivada)"], med_map["Azithromycin 500mg"], "Available", 115.0, t_25m, "Full stock in blister packs."),
+        (pharm_map["Sri Venkateswara Medicals (Gudivada)"], med_map["Pantoprazole 40mg"], "Available", 60.0, t_1h, "Strip of 10 tablets."),
+        (pharm_map["Sri Venkateswara Medicals (Gudivada)"], med_map["Metformin 500mg"], "Available", 40.0, t_1h, "Available."),
+
+        # Apollo Pharmacy Gudivada
+        (pharm_map["Apollo Pharmacy Gudivada"], med_map["ORS Sachet"], "Available", 22.0, t_10m, "Electrolyte recharge stock available."),
+        (pharm_map["Apollo Pharmacy Gudivada"], med_map["Diclofenac Gel"], "Available", 58.0, t_25m, "Volini & generic diclofenac in stock."),
+        (pharm_map["Apollo Pharmacy Gudivada"], med_map["Cetirizine 10mg"], "Available", 18.0, t_10m, "Allergy tabs in stock."),
+
+        # District Hospital Road Medicals (Machilipatnam)
+        (pharm_map["District Hospital Road Medicals (Machilipatnam)"], med_map["Paracetamol 500mg"], "Available", 19.0, t_10m, "Hospital emergency counter ready."),
+        (pharm_map["District Hospital Road Medicals (Machilipatnam)"], med_map["Amoxicillin 500mg"], "Available", 88.0, t_1h, "Fresh batch available."),
+        (pharm_map["District Hospital Road Medicals (Machilipatnam)"], med_map["Dettol Antiseptic Liquid"], "Available", 70.0, t_6h, "Antiseptic in stock."),
+
+        # Sri Satya Sai Pharmacy (Machilipatnam)
+        (pharm_map["Sri Satya Sai Pharmacy (Machilipatnam)"], med_map["Cough Syrup DX"], "Available", 82.0, t_25m, "Syrups and bronchodilators available."),
+        (pharm_map["Sri Satya Sai Pharmacy (Machilipatnam)"], med_map["Pantoprazole 40mg"], "Available", 62.0, t_1h, "Gastro-resistant tabs in stock.")
     ]
 
     cur.executemany("""
@@ -330,7 +386,7 @@ def seed_database():
     # Activate Local Skill Profile for Venkata Rao
     cur.execute("""
     INSERT INTO user_skill_profiles (user_id, skill_name, certificate_id, is_available_for_work, hourly_rate, bio)
-    VALUES (?, 'Household Electrical & Fan Repair', ?, 1, 100.0, 'Certified in basic electrical repairs by LOCALServe SkillShare. Available for evening neighborhood repairs in Gudlavalleru.');
+    VALUES (?, 'Household Electrical & Fan Repair', ?, 1, 100.0, 'Certified in basic electrical repairs by SevaSetu SkillShare. Available for evening neighborhood repairs in Gudlavalleru and nearby Gudivada.');
     """, (cust_uid, cert1_id))
 
     print("Seeding Community Group Workshops...")
@@ -338,14 +394,17 @@ def seed_database():
     INSERT INTO training_sessions (course_id, mentor_id, title, date, time, location, capacity, available_seats, fee, status)
     VALUES
     (?, ?, 'Free Community Electrical Safety & Fan Repair Workshop', '2026-10-05', '10:00 AM - 1:00 PM', 'Gudlavalleru Gram Panchayat Community Hall, PIN: 521356', 20, 14, 0.0, 'Scheduled'),
-    (?, ?, 'Practical Water Tap & Pipe Jointing Session', '2026-10-10', '02:00 PM - 5:00 PM', 'RTC Bus Stand Community Workshop, Gudlavalleru - 521356', 15, 9, 0.0, 'Scheduled');
-    """, (c1_id, ramesh_mid, c2_id, suresh_mid))
+    (?, ?, 'Practical Water Tap & Pipe Jointing Session', '2026-10-10', '02:00 PM - 5:00 PM', 'RTC Bus Stand Community Workshop, Gudlavalleru - 521356', 15, 9, 0.0, 'Scheduled'),
+    (?, ?, 'Two-Wheeler Carburetor & Electrical Diagnostic Camp', '2026-10-14', '11:00 AM - 3:00 PM', 'Nehru Chowk Community Hall, Gudivada - 521301', 25, 18, 0.0, 'Scheduled');
+    """, (c1_id, ramesh_mid, c2_id, suresh_mid, c1_id, ramesh_mid))
 
-    print("Seeding Community Notices & Volunteers...")
+    print("Seeding Community Notices & Volunteers across Gudlavalleru, Gudivada & Machilipatnam...")
     notices_data = [
         ("Drinking Water Tank & Pipeline Maintenance", "Water Supply", "Gudlavalleru Gram Panchayat drinking water supply will be paused tomorrow from 10:00 AM to 2:00 PM for overhead tank desilting near Ryves canal.", "2026-10-02"),
         ("Free Eye & General Health Camp at Gudlavalleru PHC", "Health Camp", "Free health checkup, blood sugar testing, and eye consultation by district hospital medical team at Gudlavalleru Community Hall this Sunday.", "2026-10-06"),
-        ("Agricultural Sprayer & Motor Maintenance Camp", "Agriculture", "Bring manual and battery pesticide sprayers to Gudlavalleru Market Yard / Rythu Seva Kendram for free nozzle cleanup and pump washer servicing.", "2026-10-08")
+        ("Krishna District Mobile Health Van (Machilipatnam - Gudivada - Gudlavalleru)", "Health Camp", "District Hospital Machilipatnam Mobile Diagnostic Unit will visit Gudlavalleru Friday and Gudivada Saturday with free diagnostic kits.", "2026-10-12"),
+        ("Agricultural Sprayer & Motor Maintenance Camp", "Agriculture", "Bring manual and battery pesticide sprayers to Gudlavalleru Market Yard / Rythu Seva Kendram for free nozzle cleanup and pump washer servicing.", "2026-10-08"),
+        ("Gudivada - Gudlavalleru Rural RTC Direct Shuttles", "Transport", "New scheduled morning and evening RTC feeder shuttles connecting Gudlavalleru SRGEC to Gudivada Junction and Machilipatnam RTC Depot.", "2026-10-15")
     ]
     cur.executemany("""
     INSERT INTO community_notices (title, category, content, date_effective)
@@ -353,10 +412,13 @@ def seed_database():
     """, notices_data)
 
     vol_uid = user_map["kavitha@volunteer.com"]
+    vol_rajesh_uid = user_map["rajesh@volunteer.com"]
     cur.execute("""
     INSERT INTO volunteers (user_id, area, phone, skills_assisted)
-    VALUES (?, 'College Road, Gandhi Bomma Center & Station Area, Gudlavalleru (521356)', '+91 9848088776', 'Assisting elderly residents with medicine search and booking verified electricians/plumbers across Gudlavalleru Mandal.');
-    """, (vol_uid,))
+    VALUES
+    (?, 'College Road, Gandhi Bomma Center & Station Area, Gudlavalleru (521356)', '+91 9848088776', 'Assisting elderly residents with medicine search and booking verified electricians/plumbers across Gudlavalleru Mandal.'),
+    (?, 'Koneru Center, District Hospital & Port Road, Machilipatnam (521001)', '+91 9848299887', 'Guiding senior citizens with hospital medicine availability and doorstep appliance repair technicians.');
+    """, (vol_uid, vol_rajesh_uid))
 
     # Peer to Peer Skill Exchange
     cur.execute("""
@@ -368,7 +430,7 @@ def seed_database():
 
     conn.commit()
     conn.close()
-    print("Database seeded with rich SkillShare, Mentor, Course, Workshop, and Community data!")
+    print("Database seeded with rich SevaSetu multi-town services across Gudlavalleru, Gudivada & Machilipatnam!")
 
 if __name__ == '__main__':
     seed_database()

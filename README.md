@@ -1,7 +1,8 @@
-# LOCALServe
-### A Hyperlocal Community Platform for Essential Services and Medicine Availability
+# SevaSetu
+### A Hyperlocal Community Platform for Essential Services, Medicine Availability & SkillShare
+**Serving:** Gudlavalleru (521356) &bull; Gudivada (521301) &bull; Machilipatnam (521001) &bull; Krishna District, Andhra Pradesh
 
-LOCALServe connects local community residents, villages, and small towns with nearby verified service providers (electricians, plumbers, carpenters, mechanics, repair technicians) and local pharmacies reporting available medicines with last-updated timestamps.
+SevaSetu connects local community residents, rural villages, and semi-urban hubs with nearby verified service providers (electricians, plumbers, carpenters, mechanics, repair technicians), registered local pharmacies reporting available medicines with last-updated timestamps, and community peer-to-peer vocational skill development.
 
 ---
 
@@ -90,4 +91,4 @@ At the top of every screen is a **Quick Demo Role Switcher** for evaluators:
 ```powershell
 .venv\Scripts\python.exe test_app.py
 ```
-Runs 8 automated unit tests covering seeding, Haversine formula, booking lifecycle, medicine requests, and REST APIs.
+Runs 14 automated unit tests covering database seeding, Haversine proximity calculations, booking lifecycle, medicine requests, REST APIs, SkillShare certification, workshops, emergency mode, and Panchayat notice feeds.

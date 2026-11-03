@@ -52,16 +52,23 @@ def create_app():
         
         all_services = query_db("SELECT * FROM services ORDER BY name ASC")
         all_skills = query_db("SELECT * FROM skill_categories ORDER BY name ASC")
+
+        active_loc_id = session.get('active_location_id', 'gudlavalleru')
+        active_loc = next((loc for loc in Config.LOCATIONS if loc['id'] == active_loc_id), Config.LOCATIONS[0])
         
         return dict(
             unread_notifications=unread_notifications,
             global_services=all_services,
             global_skills=all_skills,
-            community_name=getattr(Config, 'LOCATION_NAME', 'Gudlavalleru'),
-            community_pincode=getattr(Config, 'PINCODE', '521356'),
+            app_name=getattr(Config, 'APP_NAME', 'SevaSetu'),
+            app_name_telugu=getattr(Config, 'APP_NAME_TELUGU', 'సేవాసేతు'),
+            locations=getattr(Config, 'LOCATIONS', []),
+            active_location=active_loc,
+            community_name=active_loc['name'],
+            community_pincode=active_loc['pincode'],
             community_district=getattr(Config, 'DISTRICT', 'Krishna District, Andhra Pradesh'),
-            default_lat=Config.DEFAULT_LAT,
-            default_lng=Config.DEFAULT_LNG
+            default_lat=session.get('user_lat', active_loc['lat']),
+            default_lng=session.get('user_lng', active_loc['lng'])
         )
 
     # 404 Error handler
@@ -74,7 +81,8 @@ def create_app():
 if __name__ == '__main__':
     app = create_app()
     print("==================================================")
-    print("LOCALServe 2.0: Community Services & SkillShare Running")
+    print("SevaSetu: Community Services & SkillShare Platform")
+    print("Regional Hubs: Gudlavalleru | Gudivada | Machilipatnam")
     print("Access locally at: http://127.0.0.1:5000")
     print("==================================================")
     app.run(debug=True, host='127.0.0.1', port=5000)

@@ -1,1 +1,1 @@
-# Blueprint package for LOCALServe
+# Blueprint package for SevaSetu

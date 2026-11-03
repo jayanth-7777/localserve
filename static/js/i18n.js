@@ -1,7 +1,7 @@
 // Multi-language Translation Engine (English, Telugu, Hindi)
 const translations = {
   en: {
-    app_title: "LOCALServe - Hyperlocal Essential Services & Medicine Availability",
+    app_title: "SevaSetu - Hyperlocal Essential Services & Medicine Availability",
     tagline: "Connecting Villages & Communities to Nearby Services and Verified Medicines",
     services: "Services",
     medicines: "Medicines",

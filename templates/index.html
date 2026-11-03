@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}LOCALServe - Hyperlocal Services & Pharmacy Availability{% endblock %}
+{% block title %}SevaSetu - Hyperlocal Services & Pharmacy Availability | Gudlavalleru &bull; Gudivada &bull; Machilipatnam{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -11,17 +11,23 @@
       <div class="col-lg-8">
         <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
           <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">
-            <i class="fa-solid fa-location-dot text-danger"></i> Gudlavalleru &bull; PIN: 521356
+            <i class="fa-solid fa-location-dot text-danger"></i> Gudlavalleru &bull; 521356
           </span>
+          <a href="{{ url_for('customer.set_location', loc='gudivada', next=request.path) }}" class="badge bg-white text-dark text-decoration-none fw-bold px-3 py-2 fs-6">
+            <i class="fa-solid fa-building text-primary"></i> Gudivada &bull; 521301
+          </a>
+          <a href="{{ url_for('customer.set_location', loc='machilipatnam', next=request.path) }}" class="badge bg-white text-dark text-decoration-none fw-bold px-3 py-2 fs-6">
+            <i class="fa-solid fa-anchor text-info"></i> Machilipatnam &bull; 521001
+          </a>
           <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-2">
             Krishna District, AP
           </span>
         </div>
         <h1 class="display-5 fw-extrabold text-white mb-3">
-          Find Local Services & Medicine Availability in Gudlavalleru
+          Find Local Services & Medicine Availability in SevaSetu
         </h1>
         <p class="lead mb-4 text-light">
-          Connect directly with verified electricians, plumbers, carpenters, mechanics, and registered pharmacies in <b>Gudlavalleru</b> and neighboring mandal villages (Dokiparru, Angaluru, Kowtharam, Penjendra).
+          Connecting rural citizens, farmers, students and families in <b>Gudlavalleru</b>, <b>Gudivada</b>, and <b>Machilipatnam</b> with verified doorstep technicians, verified pharmacies, and peer skill training.
         </p>
 
         <!-- Search Bar with Big Microphone Button -->
@@ -30,20 +36,20 @@
             <i class="fa-solid fa-microphone fs-5"></i>
           </button>
           <input type="text" class="form-control border-0 fs-5 ps-2" id="heroSearchInput" name="q"
-                 placeholder="Search electrician, plumber, mechanic, medicine in Gudlavalleru..." data-i18n="search_placeholder_service">
+                 placeholder="Search electrician, plumber, mechanic, medicine in Gudlavalleru, Gudivada, Machilipatnam..." data-i18n="search_placeholder_service">
           <button type="submit" class="btn btn-warning px-4 py-2 fw-bold text-dark rounded-3 fs-6">
             <i class="fa-solid fa-magnifying-glass me-1"></i> Search
           </button>
         </form>
         <div class="mt-2 text-light small d-flex align-items-center gap-3">
-          <span><i class="fa-solid fa-circle-info text-warning"></i> <b>Tip:</b> Click the red microphone to speak in Telugu, Hindi, or English!</span>
+          <span><i class="fa-solid fa-circle-info text-warning"></i> <b>Tip:</b> Click the microphone to speak in Telugu, Hindi, or English!</span>
         </div>
       </div>
       <div class="col-lg-4 d-none d-lg-block text-center">
         <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25">
-          <i class="fa-solid fa-landmark-flag display-1 text-warning mb-3"></i>
-          <h4 class="text-white fw-bold">Gudlavalleru Gram Panchayat</h4>
-          <p class="small text-light mb-0">Bridging rural citizens, farmers, and students around SRGEC campus with essential community technical skills and medicine supply.</p>
+          <i class="fa-solid fa-handshake-angle display-1 text-warning mb-3"></i>
+          <h4 class="text-white fw-bold">SevaSetu Community Network</h4>
+          <p class="small text-light mb-0">Bridging rural citizens, farmers, and students around SRGEC Gudlavalleru with nearby commercial services in Gudivada and district resources in Machilipatnam.</p>
         </div>
       </div>
     </div>
@@ -53,8 +59,8 @@
   <div class="mb-4">
     <a href="{{ url_for('customer.emergency_view') }}" class="btn btn-danger btn-lg w-100 py-3 rounded-4 shadow fw-bold d-flex align-items-center justify-content-center gap-3 text-decoration-none emergency-pulse" style="font-size: 1.25rem; border: 3px solid #ffc107;">
       <i class="fa-solid fa-triangle-exclamation fs-1 text-warning"></i>
-      <span class="text-uppercase tracking-wider">🆘 I NEED HELP NOW — Gudlavalleru Emergency Mode</span>
-      <span class="badge bg-warning text-dark px-3 py-1 fs-6 d-none d-md-inline">Local Technicians 1-Tap Dial</span>
+      <span class="text-uppercase tracking-wider">🆘 I NEED HELP NOW — SevaSetu Emergency Mode</span>
+      <span class="badge bg-warning text-dark px-3 py-1 fs-6 d-none d-md-inline">Gudlavalleru &bull; Gudivada &bull; Machilipatnam</span>
     </a>
   </div>
 
@@ -86,9 +92,9 @@
     <div class="card-header bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
       <div>
         <h5 class="mb-0 fw-bold text-warning">
-          <i class="fa-solid fa-chart-line me-2"></i> LOCALServe Gudlavalleru (521356) Skill & Social Impact Dashboard
+          <i class="fa-solid fa-chart-line me-2"></i> SevaSetu Regional Community Skill & Social Impact Dashboard
         </h5>
-        <small class="text-secondary">Factual verified counters demonstrating grassroots community impact across Gudlavalleru Mandal</small>
+        <small class="text-secondary">Factual verified platform counters across Gudlavalleru, Gudivada & Machilipatnam</small>
       </div>
       <span class="badge bg-secondary text-white px-3 py-1"><i class="fa-solid fa-circle-check text-success me-1"></i> Live Verified</span>
     </div>
@@ -422,7 +428,7 @@
     <div class="row align-items-center">
       <div class="col-lg-8">
         <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-2 fs-6">
-          <i class="fa-solid fa-award"></i> NEW: LOCALServe SkillShare
+          <i class="fa-solid fa-award"></i> NEW: SevaSetu SkillShare
         </span>
         <h2 class="fw-bold mb-2">Learn Real Trade Skills from Village Master Mentors</h2>
         <p class="text-light opacity-90 mb-3">
@@ -453,7 +459,7 @@
       <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-warning border-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="fw-bold mb-0 text-dark">
-            <i class="fa-solid fa-bullhorn text-warning me-2"></i> Gudlavalleru Panchayat Notices
+            <i class="fa-solid fa-bullhorn text-warning me-2"></i> Regional Community Notices
           </h4>
           <a href="{{ url_for('customer.notices') }}" class="btn btn-sm btn-outline-warning text-dark fw-bold">All Notices &rarr;</a>
         </div>
@@ -463,15 +469,15 @@
             <div class="list-group-item px-0 py-2">
               <div class="d-flex justify-content-between align-items-center mb-1">
                 <strong class="text-dark">{{ n.title }}</strong>
-                <span class="badge {% if n.priority == 'Urgent' %}bg-danger{% elif n.priority == 'High' %}bg-warning text-dark{% else %}bg-primary{% endif %}">{{ n.priority }}</span>
+                <span class="badge bg-warning text-dark">{{ n.category }}</span>
               </div>
-              <p class="text-secondary small mb-1">{{ n.message }}</p>
+              <p class="text-secondary small mb-1">{{ n.content }}</p>
               <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i> Effective: {{ n.date_effective }}</small>
             </div>
             {% endfor %}
           </div>
         {% else %}
-          <p class="text-muted small">No active advisories today in Gudlavalleru.</p>
+          <p class="text-muted small">No active advisories today across Gudlavalleru, Gudivada, or Machilipatnam.</p>
         {% endif %}
       </div>
     </div>
@@ -480,19 +486,19 @@
       <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-success border-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="fw-bold mb-0 text-dark">
-            <i class="fa-solid fa-hands-holding-child text-success me-2"></i> Gudlavalleru Volunteers
+            <i class="fa-solid fa-hands-holding-child text-success me-2"></i> Community Volunteers
           </h4>
           <a href="{{ url_for('customer.volunteers_view') }}" class="btn btn-sm btn-outline-success fw-bold">View Helpers &rarr;</a>
         </div>
         <p class="text-secondary small mb-3">
-          Dedicated neighborhood youth in Gudlavalleru ready to assist elderly citizens with medicine delivery, hospital transport, and technical help.
+          Dedicated neighborhood youth in Gudlavalleru, Gudivada & Machilipatnam ready to assist elderly citizens with medicine delivery, hospital transport, and technical help.
         </p>
         <div class="p-3 bg-light rounded-3 small border mb-3">
           <div class="d-flex align-items-center gap-2 mb-1">
             <i class="fa-solid fa-hand-holding-heart text-success fs-5"></i>
             <span class="fw-bold">Elderly & Emergency Assistance</span>
           </div>
-          <div class="text-muted">Direct phone assistance with zero agency commission.</div>
+          <div class="text-muted">Direct phone assistance with zero agency commission across Krishna District hubs.</div>
         </div>
         <a href="{{ url_for('customer.volunteers_view') }}" class="btn btn-success fw-bold w-100 rounded-pill">
           <i class="fa-solid fa-phone me-1"></i> Contact Local Volunteers

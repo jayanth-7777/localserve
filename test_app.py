@@ -44,7 +44,7 @@ class LocalServeTestCase(unittest.TestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Gramin Quick-Assist', response.data)
-        self.assertIn(b'LOCALServe', response.data)
+        self.assertIn(b'SevaSetu', response.data)
 
         # Services search
         serv_resp = self.client.get('/services?category=Electrician&radius=15')
@@ -71,7 +71,7 @@ class LocalServeTestCase(unittest.TestCase):
         # Admin login
         res = self.client.get('/quick-login/admin', follow_redirects=True)
         self.assertEqual(res.status_code, 200)
-        self.assertIn(b'LOCALServe Platform Administration', res.data)
+        self.assertIn(b'SevaSetu Platform Administration', res.data)
 
     def test_medicine_search_and_availability(self):
         """Verify medicine search shows pharmacy-reported status and timestamps."""

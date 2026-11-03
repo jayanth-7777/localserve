@@ -265,7 +265,7 @@ def complete_lesson(enrollment_id, lesson_id):
         WHERE enrollment_id = ?
     """, (progress, status, completed_at, enrollment_id))
 
-    # If 100% completed, auto-issue official LOCALServe Certificate
+    # If 100% completed, auto-issue official SevaSetu Certificate
     cert = None
     if progress >= 100:
         existing_cert = query_db("SELECT * FROM skill_certificates WHERE enrollment_id = ?", (enrollment_id,), one=True)
@@ -282,7 +282,7 @@ def complete_lesson(enrollment_id, lesson_id):
                 INSERT INTO skill_certificates (enrollment_id, certificate_number, verification_code)
                 VALUES (?, ?, ?)
             """, (enrollment_id, cert_num, verif_code))
-            flash('🎉 Congratulations! You have completed the entire course! Your LOCALServe Certificate is ready!', 'success')
+            flash('🎉 Congratulations! You have completed the entire course! Your SevaSetu Certificate is ready!', 'success')
             return redirect(url_for('skillshare.certificate_view', cert_code=verif_code))
 
     flash('Lesson marked as completed!', 'success')
@@ -407,7 +407,7 @@ def activate_work_profile():
     skill_name = request.form.get('skill_name', '').strip()
     cert_id = request.form.get('certificate_id')
     rate = float(request.form.get('hourly_rate', 120))
-    bio = request.form.get('bio', 'Certified via LOCALServe SkillShare practical course.')
+    bio = request.form.get('bio', 'Certified via SevaSetu SkillShare practical course.')
 
     execute_db("""
         INSERT INTO user_skill_profiles (user_id, skill_name, certificate_id, is_available_for_work, hourly_rate, bio)

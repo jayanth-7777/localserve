@@ -130,7 +130,7 @@ def toggle_mentor_mode():
     provider = query_db("SELECT provider_id, experience_years FROM providers WHERE user_id = ?", (session['user_id'],), one=True)
     existing = query_db("SELECT mentor_id FROM mentor_profiles WHERE provider_id = ?", (provider['provider_id'],), one=True)
 
-    bio = request.form.get('bio', 'Certified LOCALServe skill mentor teaching practical trade skills.').strip()
+    bio = request.form.get('bio', 'Certified SevaSetu skill mentor teaching practical trade skills.').strip()
     languages = request.form.get('languages', 'Telugu, English').strip()
     teaching_mode = request.form.get('teaching_mode', 'In-Person')
     is_free = 1 if request.form.get('is_community_free') == 'on' else 0

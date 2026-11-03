@@ -121,7 +121,7 @@ def smart_assistant():
         'intent': 'general',
         'type': 'general',
         'category': 'General Search',
-        'title': 'Searching LOCALServe',
+        'title': 'Searching SevaSetu',
         'redirect_url': f'/services?q={query}',
         'message': f"Searching for verified providers matching '{query}'."
     })

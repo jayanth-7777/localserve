@@ -59,10 +59,22 @@ def index():
         notices=notices
     )
 
+@customer_bp.route('/set-location')
+def set_location():
+    loc_id = request.args.get('loc', 'gudlavalleru').lower()
+    next_url = request.args.get('next', url_for('customer.index'))
+    matched = next((l for l in Config.LOCATIONS if l['id'] == loc_id), Config.LOCATIONS[0])
+    session['active_location_id'] = matched['id']
+    session['user_lat'] = matched['lat']
+    session['user_lng'] = matched['lng']
+    session['location_name'] = matched['name']
+    flash(f"Switched region to {matched['name']} ({matched['telugu_name']}) - PIN {matched['pincode']}", 'info')
+    return redirect(next_url)
+
 @customer_bp.route('/services')
 def services_list():
     category = request.args.get('category', '')
-    radius = float(request.args.get('radius', 15.0))
+    radius = float(request.args.get('radius', 25.0))
     search = request.args.get('q', '').strip().lower()
     available_only = request.args.get('available_now', '') == '1'
     
