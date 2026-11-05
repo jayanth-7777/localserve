@@ -9,33 +9,36 @@
 
       <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border mb-4">
         <div class="text-center mb-4">
-          <div class="service-icon-box bg-warning bg-opacity-25 text-dark mb-2" style="width: 60px; height: 60px;">
+          <div class="service-icon-box bg-warning bg-opacity-25 text-dark mb-2 mx-auto" style="width: 64px; height: 64px;">
             <i class="fa-solid fa-user-plus fs-3"></i>
           </div>
-          <h3 class="fw-bold text-dark">Join SevaSetu</h3>
-          <p class="text-muted small">Register as a customer, verified local technician, or community pharmacy</p>
+          <h3 class="fw-bold text-dark mb-1">Join SevaSetu Network</h3>
+          <p class="text-muted small mb-0">Register as a citizen customer, skilled local technician, or village pharmacy</p>
         </div>
 
         <form action="{{ url_for('auth.register') }}" method="POST" id="registerForm">
           
           <!-- Role Selector -->
           <div class="mb-4">
-            <label class="form-label fw-bold small text-uppercase text-secondary">I want to register as a:</label>
+            <label class="form-label fw-bold small text-uppercase text-secondary">Account Registration Type:</label>
             <div class="row g-2">
               <div class="col-4">
-                <input type="radio" class="btn-check" name="role" id="roleCustomer" value="customer" checked onchange="handleRoleChange('customer')">
+                <input type="radio" class="btn-check" name="role" id="roleCustomer" value="customer"
+                       {% if current_role == 'customer' %}checked{% endif %} onchange="handleRoleChange('customer')">
                 <label class="btn btn-outline-primary w-100 py-2 fw-bold" for="roleCustomer">
-                  <i class="fa-solid fa-user d-block fs-4 mb-1"></i> Customer
+                  <i class="fa-solid fa-user d-block fs-4 mb-1"></i> Citizen
                 </label>
               </div>
               <div class="col-4">
-                <input type="radio" class="btn-check" name="role" id="roleProvider" value="provider" onchange="handleRoleChange('provider')">
+                <input type="radio" class="btn-check" name="role" id="roleProvider" value="provider"
+                       {% if current_role == 'provider' %}checked{% endif %} onchange="handleRoleChange('provider')">
                 <label class="btn btn-outline-warning text-dark w-100 py-2 fw-bold" for="roleProvider">
                   <i class="fa-solid fa-screwdriver-wrench d-block fs-4 mb-1 text-warning"></i> Provider
                 </label>
               </div>
               <div class="col-4">
-                <input type="radio" class="btn-check" name="role" id="rolePharmacy" value="pharmacy" onchange="handleRoleChange('pharmacy')">
+                <input type="radio" class="btn-check" name="role" id="rolePharmacy" value="pharmacy"
+                       {% if current_role == 'pharmacy' %}checked{% endif %} onchange="handleRoleChange('pharmacy')">
                 <label class="btn btn-outline-success w-100 py-2 fw-bold" for="rolePharmacy">
                   <i class="fa-solid fa-prescription-bottle-medical d-block fs-4 mb-1 text-success"></i> Pharmacy
                 </label>
@@ -46,34 +49,42 @@
           <!-- Basic User Info -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <label class="form-label fw-bold small">Full Name</label>
+              <label class="form-label fw-bold small">Full Name <span class="text-danger">*</span></label>
               <input type="text" name="name" class="form-control" required placeholder="e.g. Ramesh Kumar">
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-bold small">Mobile Phone Number</label>
+              <label class="form-label fw-bold small">Mobile Phone Number <span class="text-danger">*</span></label>
               <input type="tel" name="phone" class="form-control" required placeholder="+91 9876543210">
             </div>
           </div>
 
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <label class="form-label fw-bold small">Email Address</label>
+              <label class="form-label fw-bold small">Email Address <span class="text-danger">*</span></label>
               <input type="email" name="email" class="form-control" required placeholder="name@example.com">
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-bold small">Password</label>
+              <label class="form-label fw-bold small">Password <span class="text-danger">*</span></label>
               <input type="password" name="password" class="form-control" required placeholder="Minimum 6 characters">
             </div>
           </div>
 
           <!-- PROVIDER SPECIFIC SECTION -->
-          <div id="providerFields" class="p-3 bg-light rounded-3 border mb-3 d-none">
-            <h6 class="fw-bold text-warning text-dark mb-3">
-              <i class="fa-solid fa-tools me-1"></i> Professional Technician Profile
-            </h6>
+          <div id="providerFields" class="p-3 bg-light rounded-3 border mb-3 {% if current_role != 'provider' %}d-none{% endif %}">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="fw-bold text-dark mb-0">
+                <i class="fa-solid fa-tools text-warning me-1"></i> Professional Trade & Verification Details
+              </h6>
+              <span class="badge bg-warning text-dark"><i class="fa-solid fa-shield-halved"></i> Verification Required</span>
+            </div>
+
+            <div class="alert alert-warning py-2 px-3 small mb-3">
+              <i class="fa-solid fa-circle-info me-1"></i> <b>Admin Approval Notice:</b> To protect rural families, all new service providers require Panchayat Administrator verification of trade ID before appearing in customer searches within 30 km.
+            </div>
+
             <div class="row g-3 mb-3">
               <div class="col-md-6">
-                <label class="form-label fw-bold small">Service Category</label>
+                <label class="form-label fw-bold small">Service Category <span class="text-danger">*</span></label>
                 <select name="category" class="form-select">
                   {% for s in services %}
                     <option value="{{ s.category }}">{{ s.name }} ({{ s.telugu_name or '' }})</option>
@@ -89,49 +100,72 @@
                 <input type="number" name="charges_per_hr" class="form-control" value="150" min="50">
               </div>
             </div>
+
+            <!-- Trade & Identity Proof for Admin Approval -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Identity / Trade Proof Type <span class="text-danger">*</span></label>
+                <select name="id_proof_type" class="form-select">
+                  <option value="Aadhaar Card">Aadhaar Card</option>
+                  <option value="Voter ID Card">Voter ID Card</option>
+                  <option value="Driving License">Driving License</option>
+                  <option value="Trade License / ITI Certificate">Trade License / ITI Certificate</option>
+                  <option value="Panchayat Artisan Registration">Panchayat Artisan Registration</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">ID Proof / Certificate Number <span class="text-danger">*</span></label>
+                <input type="text" name="id_proof_number" class="form-control" placeholder="e.g. 1234-5678-9012 or ITI-ELE-2021">
+              </div>
+            </div>
+
             <div class="mb-2">
               <label class="form-label fw-bold small">Bio & Special Skills</label>
-              <textarea name="bio" class="form-control" rows="2" placeholder="e.g. Expert in house wiring, tube well starters, invertors..."></textarea>
+              <textarea name="bio" class="form-control" rows="2" placeholder="e.g. Expert in house wiring, motor starters, farm borewell invertors..."></textarea>
             </div>
           </div>
 
           <!-- PHARMACY SPECIFIC SECTION -->
-          <div id="pharmacyFields" class="p-3 bg-light rounded-3 border mb-3 d-none">
-            <h6 class="fw-bold text-success mb-3">
-              <i class="fa-solid fa-clinic-medical me-1"></i> Pharmacy Details
+          <div id="pharmacyFields" class="p-3 bg-light rounded-3 border mb-3 {% if current_role != 'pharmacy' %}d-none{% endif %}">
+            <h6 class="fw-bold text-success mb-2">
+              <i class="fa-solid fa-clinic-medical me-1"></i> Pharmacy Store Details
             </h6>
-            <div class="mb-3">
-              <label class="form-label fw-bold small">Pharmacy Store Name</label>
-              <input type="text" name="pharmacy_name" class="form-control" placeholder="e.g. Balaji Medical & General Store">
-            </div>
-            <div class="mb-2">
-              <label class="form-label fw-bold small">Operating Timings</label>
-              <input type="text" name="timings" class="form-control" value="8:00 AM - 10:00 PM">
+            <div class="row g-3 mb-2">
+              <div class="col-md-7">
+                <label class="form-label fw-bold small">Pharmacy Store Name <span class="text-danger">*</span></label>
+                <input type="text" name="pharmacy_name" class="form-control" placeholder="e.g. Balaji Medical & General Store">
+              </div>
+              <div class="col-md-5">
+                <label class="form-label fw-bold small">Operating Timings</label>
+                <input type="text" name="timings" class="form-control" value="8:00 AM - 10:00 PM">
+              </div>
             </div>
           </div>
 
           <!-- Address & GPS Coordinates -->
           <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center mb-1">
-              <label class="form-label fw-bold small mb-0">Village / Landmark / Street Address</label>
+              <label class="form-label fw-bold small mb-0">Village / Landmark / Street Address <span class="text-danger">*</span></label>
               <button type="button" class="btn btn-sm btn-outline-primary" onclick="detectCoordsForRegister()">
                 <i class="fa-solid fa-location-crosshairs text-danger me-1"></i> Use My GPS Coords
               </button>
             </div>
-            <textarea name="address" class="form-control" rows="2" required placeholder="House No, Street / Landmark, Gudlavalleru - 521356..."></textarea>
+            <textarea name="address" class="form-control" rows="2" required placeholder="House No, Street / Landmark, Village / Town, PIN Code (e.g. Gudlavalleru - 521356)..."></textarea>
             
             <input type="hidden" name="latitude" id="regLat" value="{{ default_lat|default(16.3486) }}">
             <input type="hidden" name="longitude" id="regLng" value="{{ default_lng|default(81.0442) }}">
-            <div class="small text-muted mt-1" id="coordsDisplay">Default Location: Gudlavalleru ({{ default_lat|default(16.3486) }}, {{ default_lng|default(81.0442) }}) - PIN: {{ community_pincode|default('521356') }}</div>
+            <div class="small text-muted mt-1" id="coordsDisplay">
+              📍 Default GPS: Gudlavalleru ({{ default_lat|default(16.3486) }}, {{ default_lng|default(81.0442) }}) - PIN: {{ community_pincode|default('521356') }}
+            </div>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 fw-bold py-2 fs-6">
+          <button type="submit" class="btn btn-primary w-100 fw-bold py-2 fs-6 shadow-sm">
             <i class="fa-solid fa-check me-1"></i> Complete Registration
           </button>
         </form>
 
         <div class="text-center small text-muted mt-3">
-          Already have an account? <a href="{{ url_for('auth.login') }}" class="fw-bold">Sign In here</a>
+          Already have an account? <a href="{{ url_for('auth.login', role=current_role) }}" class="fw-bold">Sign In here</a>
         </div>
       </div>
 
@@ -160,13 +194,22 @@
 
   function detectCoordsForRegister() {
     if (navigator.geolocation) {
+      const coordsDisplay = document.getElementById('coordsDisplay');
+      coordsDisplay.innerHTML = `<span class="spinner-border spinner-border-sm text-primary"></span> Detecting GPS coordinates...`;
       navigator.geolocation.getCurrentPosition((pos) => {
         document.getElementById('regLat').value = pos.coords.latitude;
         document.getElementById('regLng').value = pos.coords.longitude;
-        document.getElementById('coordsDisplay').innerHTML = `📍 GPS Set: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
-        alert("GPS Coordinates captured successfully!");
-      });
+        coordsDisplay.innerHTML = `📍 GPS Set: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+      }, (err) => {
+        coordsDisplay.innerHTML = `⚠️ GPS detection failed. Using default community center.`;
+      }, { timeout: 8000, enableHighAccuracy: true });
     }
   }
+
+  // Preselect on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentRole = "{{ current_role|default('customer') }}";
+    handleRoleChange(currentRole);
+  });
 </script>
 {% endblock %}

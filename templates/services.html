@@ -7,14 +7,19 @@
 
   <!-- Header & Filter Bar -->
   <div class="bg-white p-3 p-md-4 rounded-4 shadow-sm border mb-4">
-    <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-      <span class="small fw-bold text-muted"><i class="fa-solid fa-map-location-dot text-primary"></i> Region Center:</span>
-      {% for loc in locations %}
-      <a href="{{ url_for('customer.set_location', loc=loc.id, next=url_for('customer.services_list', category=selected_category, radius=radius)) }}"
-         class="btn btn-sm {% if loc.id == active_location.id %}btn-warning fw-bold text-dark shadow-sm{% else %}btn-outline-secondary{% endif %} rounded-pill py-1 px-3" style="font-size: 0.82rem;">
-        <i class="fa-solid fa-location-dot me-1"></i> {{ loc.name }} ({{ loc.pincode }})
-      </a>
-      {% endfor %}
+    <div class="d-flex align-items-center justify-content-between gap-2 mb-3 flex-wrap">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="small fw-bold text-muted"><i class="fa-solid fa-map-location-dot text-primary"></i> Location Center:</span>
+        {% for loc in locations %}
+        <a href="{{ url_for('customer.set_location', loc=loc.id, next=url_for('customer.services_list', category=selected_category, radius=radius)) }}"
+           class="btn btn-sm {% if loc.id == active_location.id and not session.get('active_location_id') == 'custom' %}btn-warning fw-bold text-dark shadow-sm{% else %}btn-outline-secondary{% endif %} rounded-pill py-1 px-3" style="font-size: 0.82rem;">
+          <i class="fa-solid fa-location-dot me-1"></i> {{ loc.name }} ({{ loc.pincode }})
+        </a>
+        {% endfor %}
+      </div>
+      <button type="button" class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3" onclick="detectCurrentLocation()">
+        <i class="fa-solid fa-location-crosshairs text-danger me-1"></i> Detect My Live GPS
+      </button>
     </div>
 
     <div class="row align-items-center g-3">
@@ -23,7 +28,7 @@
           <i class="fa-solid fa-screwdriver-wrench me-2"></i> Find Local Service Providers
         </h3>
         <p class="text-muted small mb-0">
-          Showing verified technicians within <b>{{ radius }} km</b> of <b>{{ active_location.name }}</b>.
+          Showing verified technicians within <b>{{ radius|int }} km</b> of <b>{{ location_name|default(active_location.name) }}</b>.
         </p>
       </div>
 
@@ -31,7 +36,6 @@
       <div class="col-lg-7">
         <form action="{{ url_for('customer.services_list') }}" method="GET" id="servicesSearchForm" class="d-flex align-items-center gap-2">
           <input type="hidden" name="category" value="{{ selected_category }}">
-          <input type="hidden" name="radius" value="{{ radius }}">
           <input type="hidden" name="lat" value="{{ user_lat }}">
           <input type="hidden" name="lng" value="{{ user_lng }}">
 
@@ -42,12 +46,13 @@
           <input type="text" class="form-control" id="serviceSearchInput" name="q" value="{{ search }}"
                  placeholder="Search by name, skills or category..." data-i18n="search_placeholder_service">
 
-          <!-- Distance Radius Selector -->
-          <select name="radius" class="form-select w-auto" onchange="document.getElementById('servicesSearchForm').submit()">
+          <!-- Distance Radius Selector (30 km Standard) -->
+          <select name="radius" class="form-select w-auto fw-bold" onchange="document.getElementById('servicesSearchForm').submit()" title="Service Search Radius">
             <option value="5" {% if radius == 5 %}selected{% endif %}>5 km</option>
             <option value="10" {% if radius == 10 %}selected{% endif %}>10 km</option>
             <option value="15" {% if radius == 15 %}selected{% endif %}>15 km</option>
             <option value="25" {% if radius == 25 %}selected{% endif %}>25 km</option>
+            <option value="30" {% if radius == 30 %}selected{% endif %}>30 km (Standard)</option>
             <option value="50" {% if radius == 50 %}selected{% endif %}>50 km</option>
           </select>
 
@@ -206,7 +211,7 @@
       {% endfor %}
     ];
 
-    initServiceMap('map', {{ user_lat }}, {{ user_lng }}, providersData, []);
+    initServiceMap('map', {{ user_lat }}, {{ user_lng }}, providersData, [], {{ radius }});
   });
 </script>
 {% endblock %}

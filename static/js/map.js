@@ -1,13 +1,14 @@
 // Leaflet.js Interactive Hyperlocal Map
 
-function initServiceMap(mapElementId, userLat, userLng, providers, pharmacies) {
+function initServiceMap(mapElementId, userLat, userLng, providers, pharmacies, radiusKm) {
   const mapContainer = document.getElementById(mapElementId);
   if (!mapContainer) return;
 
   const lat = parseFloat(userLat) || 16.3486;
   const lng = parseFloat(userLng) || 81.0442;
+  const rKm = parseFloat(radiusKm) || 30.0;
 
-  const map = L.map(mapElementId).setView([lat, lng], 14);
+  const map = L.map(mapElementId).setView([lat, lng], 11);
 
   // OpenStreetMap Tile Layer
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -24,7 +25,19 @@ function initServiceMap(mapElementId, userLat, userLng, providers, pharmacies) {
   });
 
   const userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
-  userMarker.bindPopup(`<b>Your Location</b><br>Searching within community radius.`).openPopup();
+  userMarker.bindPopup(`<b>Your Center Location</b><br>Searching verified services within ${rKm} km radius.`).openPopup();
+
+  // Draw 30 km coverage radius circle
+  const coverageCircle = L.circle([lat, lng], {
+    radius: rKm * 1000,
+    color: '#2563eb',
+    weight: 2,
+    opacity: 0.7,
+    fillColor: '#3b82f6',
+    fillOpacity: 0.08,
+    dashArray: '6, 6'
+  }).addTo(map);
+  coverageCircle.bindTooltip(`📍 ${rKm} km Community Coverage Boundary`, { permanent: false, direction: 'top' });
 
   const bounds = [[lat, lng]];
 
@@ -103,9 +116,9 @@ function initServiceMap(mapElementId, userLat, userLng, providers, pharmacies) {
     });
   }
 
-  // Fit bounds if multiple points
+  // Fit bounds if markers exist
   if (bounds.length > 1) {
-    map.fitBounds(bounds, { padding: [40, 40] });
+    map.fitBounds(bounds, { padding: [30, 30] });
   }
 
   return map;

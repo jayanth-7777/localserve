@@ -61,25 +61,41 @@ def index():
 
 @customer_bp.route('/set-location')
 def set_location():
-    loc_id = request.args.get('loc', 'gudlavalleru').lower()
+    loc_id = request.args.get('loc', '').lower()
+    custom_lat = request.args.get('lat')
+    custom_lng = request.args.get('lng')
+    custom_name = request.args.get('name', '').strip()
     next_url = request.args.get('next', url_for('customer.index'))
+
+    if custom_lat is not None and custom_lng is not None:
+        try:
+            session['user_lat'] = float(custom_lat)
+            session['user_lng'] = float(custom_lng)
+            session['location_name'] = custom_name or f"GPS Location ({float(custom_lat):.3f}, {float(custom_lng):.3f})"
+            session['active_location_id'] = 'custom'
+            flash(f"Location set to {session['location_name']}. Showing services within 30 km radius.", 'info')
+            return redirect(next_url)
+        except ValueError:
+            pass
+
     matched = next((l for l in Config.LOCATIONS if l['id'] == loc_id), Config.LOCATIONS[0])
     session['active_location_id'] = matched['id']
     session['user_lat'] = matched['lat']
     session['user_lng'] = matched['lng']
     session['location_name'] = matched['name']
-    flash(f"Switched region to {matched['name']} ({matched['telugu_name']}) - PIN {matched['pincode']}", 'info')
+    flash(f"Switched region to {matched['name']} ({matched['telugu_name']}) - PIN {matched['pincode']}. Showing services within 30 km.", 'info')
     return redirect(next_url)
 
 @customer_bp.route('/services')
 def services_list():
     category = request.args.get('category', '')
-    radius = float(request.args.get('radius', 25.0))
+    radius = float(request.args.get('radius', Config.DEFAULT_RADIUS_KM))
     search = request.args.get('q', '').strip().lower()
     available_only = request.args.get('available_now', '') == '1'
     
     user_lat = float(request.args.get('lat', session.get('user_lat', Config.DEFAULT_LAT)))
     user_lng = float(request.args.get('lng', session.get('user_lng', Config.DEFAULT_LNG)))
+    location_name = session.get('location_name', Config.LOCATION_NAME)
 
     query = """
         SELECT p.*, u.name, u.phone, u.email, s.icon, s.name as service_name,
@@ -122,7 +138,8 @@ def services_list():
         search=search,
         available_only=available_only,
         user_lat=user_lat,
-        user_lng=user_lng
+        user_lng=user_lng,
+        location_name=location_name
     )
 
 @customer_bp.route('/provider/<int:provider_id>')

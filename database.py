@@ -108,6 +108,9 @@ def init_db():
         rating_count INTEGER DEFAULT 0,
         completed_jobs_count INTEGER DEFAULT 0,
         years_on_platform INTEGER DEFAULT 1,
+        id_proof_type TEXT DEFAULT 'Aadhaar Card',
+        id_proof_number TEXT,
+        rejection_reason TEXT,
         FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
     );
     """)
@@ -458,6 +461,17 @@ def init_db():
         FOREIGN KEY (certificate_id) REFERENCES skill_certificates(certificate_id) ON DELETE SET NULL
     );
     """)
+
+    # Run migrations if columns are missing in existing tables
+    for col_def in [
+        ("id_proof_type", "TEXT DEFAULT 'Aadhaar Card'"),
+        ("id_proof_number", "TEXT"),
+        ("rejection_reason", "TEXT")
+    ]:
+        try:
+            cur.execute(f"ALTER TABLE providers ADD COLUMN {col_def[0]} {col_def[1]};")
+        except sqlite3.OperationalError:
+            pass
 
     conn.commit()
     conn.close()

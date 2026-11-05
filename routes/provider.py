@@ -115,6 +115,11 @@ def dashboard():
 @provider_bp.route('/toggle-availability', methods=['POST'])
 @role_required(['provider'])
 def toggle_availability():
+    provider = query_db("SELECT verification_status FROM providers WHERE user_id = ?", (session['user_id'],), one=True)
+    if provider and provider['verification_status'] != 'Verified':
+        flash('Your profile is currently pending Administrator verification. Status changes will be unlocked once approved.', 'warning')
+        return redirect(url_for('provider.dashboard'))
+
     new_status = request.form.get('availability', 'Available')
     if new_status not in ['Available', 'Busy', 'Offline']:
         new_status = 'Available'

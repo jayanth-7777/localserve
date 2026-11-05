@@ -5,6 +5,43 @@
 {% block content %}
 <div class="container py-3">
 
+  <!-- Verification Status Banner if Pending or Rejected -->
+  {% if provider.verification_status == 'Pending' %}
+  <div class="alert alert-warning p-4 rounded-4 shadow-sm border border-warning mb-4">
+    <div class="d-flex align-items-start gap-3">
+      <div class="fs-1 text-warning"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <div class="flex-grow-1">
+        <h5 class="fw-bold text-dark mb-1">Registration Under Administrator Review</h5>
+        <p class="text-muted small mb-2">
+          Your Service Provider application has been received. The Gram Panchayat Officer is reviewing your trade details and ID proof.
+        </p>
+        <div class="p-2 bg-white rounded-3 border small d-flex flex-wrap gap-3">
+          <span><b>Trade:</b> {{ provider.category }}</span>
+          <span><b>Rate:</b> ₹{{ provider.charges_per_hr }}/hr</span>
+          <span><b>ID Proof:</b> {{ provider.id_proof_type|default('Aadhaar / Trade Card') }} ({{ provider.id_proof_number|default('Submitted') }})</span>
+          <span><b>Location:</b> {{ provider.address }}</span>
+        </div>
+        <div class="small text-secondary mt-2">
+          <i class="fa-solid fa-circle-check text-success me-1"></i> Once approved, your profile will be publicly listed for citizens within a 30 km radius.
+        </div>
+      </div>
+    </div>
+  </div>
+  {% elif provider.verification_status == 'Rejected' %}
+  <div class="alert alert-danger p-4 rounded-4 shadow-sm border border-danger mb-4">
+    <div class="d-flex align-items-start gap-3">
+      <div class="fs-1 text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+      <div>
+        <h5 class="fw-bold text-danger mb-1">Application Requires Attention</h5>
+        <p class="small mb-1">
+          Your provider profile was not approved by the administrator. Reason: <b>{{ provider.rejection_reason|default('ID proof or experience verification could not be validated.') }}</b>
+        </p>
+        <p class="small text-muted mb-0">Please visit the Gram Panchayat office or contact administration with updated credentials.</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Provider Profile & Availability Switch Header -->
   <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
     <div class="row align-items-center g-3">

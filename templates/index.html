@@ -10,18 +10,18 @@
     <div class="row align-items-center">
       <div class="col-lg-8">
         <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
-          <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">
-            <i class="fa-solid fa-location-dot text-danger"></i> Gudlavalleru &bull; 521356
-          </span>
+          <button type="button" class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6 border-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#locationModal" title="Click to Change Location or Detect GPS">
+            <i class="fa-solid fa-location-dot text-danger"></i> {{ session.get('location_name', active_location.name) }} &bull; 30 km Radius
+          </button>
           <a href="{{ url_for('customer.set_location', loc='gudivada', next=request.path) }}" class="badge bg-white text-dark text-decoration-none fw-bold px-3 py-2 fs-6">
             <i class="fa-solid fa-building text-primary"></i> Gudivada &bull; 521301
           </a>
           <a href="{{ url_for('customer.set_location', loc='machilipatnam', next=request.path) }}" class="badge bg-white text-dark text-decoration-none fw-bold px-3 py-2 fs-6">
             <i class="fa-solid fa-anchor text-info"></i> Machilipatnam &bull; 521001
           </a>
-          <span class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-2">
-            Krishna District, AP
-          </span>
+          <button type="button" class="badge bg-white bg-opacity-25 text-white fw-bold px-3 py-2 border-0" onclick="detectCurrentLocation()" title="Auto-detect current GPS location">
+            <i class="fa-solid fa-location-crosshairs text-warning me-1"></i> Detect GPS
+          </button>
         </div>
         <h1 class="display-5 fw-extrabold text-white mb-3">
           Find Local Services & Medicine Availability in SevaSetu

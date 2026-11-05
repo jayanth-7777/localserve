@@ -53,6 +53,7 @@ def seed_database():
         # Machilipatnam Providers & Pharmacies (~26 km from Gudlavalleru)
         ("Coastal Cooling & Appliance Care (Machilipatnam)", "coastal@provider.com", "+91 9848212345", generate_password_hash("pass123"), "provider", 16.1890, 81.1400, "Robertsonpet Main Road, Machilipatnam - 521001"),
         ("Durga Heavy & Two-Wheeler Mechanics (Machilipatnam)", "durga@provider.com", "+91 9848223456", generate_password_hash("pass123"), "provider", 16.1850, 81.1350, "Near Old Bus Stand & Port Road, Machilipatnam - 521001"),
+        ("Kalyan Painter (Applicant)", "kalyan@provider.com", "+91 9848233445", generate_password_hash("pass123"), "provider", 16.3490, 81.0450, "Panchayat Office Lane, Gudlavalleru - 521356"),
         ("District Hospital Road Medicals (Machilipatnam)", "dh.med@pharmacy.com", "+91 9123456784", generate_password_hash("pass123"), "pharmacy", 16.1880, 81.1375, "Near District Headquarters Hospital, Machilipatnam - 521001"),
         ("Sri Satya Sai Pharmacy (Machilipatnam)", "satyasai@pharmacy.com", "+91 9123456785", generate_password_hash("pass123"), "pharmacy", 16.1865, 81.1395, "Koneru Center, Machilipatnam - 521001"),
         ("Rajesh Volunteer (Machilipatnam)", "rajesh@volunteer.com", "+91 9848299887", generate_password_hash("pass123"), "customer", 16.1870, 81.1380, "Koneru Center & Port Road, Machilipatnam - 521001")
@@ -86,25 +87,28 @@ def seed_database():
     print("Seeding Providers...")
     providers_data = [
         # Gudlavalleru Providers
-        (user_map["ramesh@provider.com"], "Electrician", 8, 150.0, "Available", "Verified", 16.3540, 81.0480, "Plot 12, Power Substation Road, Gudlavalleru", "Certified electrician with 8 years experience in house wiring, motor starters and farm borewell electricals across Gudlavalleru Mandal.", 4.9, 38, 86, 2),
-        (user_map["suresh@provider.com"], "Plumber", 5, 140.0, "Available", "Verified", 16.3460, 81.0410, "Shop 3, RTC Bus Stand Complex, Gudlavalleru", "Quick plumbing repairs, CPVC line fittings, overhead tank cleaning and submersible motor connections in Gudlavalleru.", 4.8, 25, 54, 2),
-        (user_map["anand@provider.com"], "Carpenter", 10, 200.0, "Busy", "Verified", 16.3475, 81.0430, "Wood Works Lane, Main Bazaar, Gudlavalleru", "Expert wood artisan for teakwood doors, lock replacement, almirah repairs and window frames in Gudlavalleru.", 4.7, 19, 32, 3),
-        (user_map["ravi@provider.com"], "Mechanic", 12, 180.0, "Available", "Verified", 16.3580, 81.0510, "College Road Junction Garage, Near SRGEC, Gudlavalleru", "On-spot puncture repair, tractor hydraulic checks, two-wheeler engine tuning near SRGEC campus.", 4.9, 52, 110, 4),
-        (user_map["shiva@provider.com"], "Appliance Repair", 6, 200.0, "Available", "Verified", 16.3450, 81.0460, "Opp. ZP High School, Gudlavalleru", "Refrigerator gas charging, cooler fan repair, ceiling fan winding and washing machine servicing in Gudlavalleru.", 4.6, 14, 28, 1),
+        (user_map["ramesh@provider.com"], "Electrician", 8, 150.0, "Available", "Verified", 16.3540, 81.0480, "Plot 12, Power Substation Road, Gudlavalleru", "Certified electrician with 8 years experience in house wiring, motor starters and farm borewell electricals across Gudlavalleru Mandal.", 4.9, 38, 86, 2, "Trade License / ITI Certificate", "ITI-ELE-GDL-2016-04"),
+        (user_map["suresh@provider.com"], "Plumber", 5, 140.0, "Available", "Verified", 16.3460, 81.0410, "Shop 3, RTC Bus Stand Complex, Gudlavalleru", "Quick plumbing repairs, CPVC line fittings, overhead tank cleaning and submersible motor connections in Gudlavalleru.", 4.8, 25, 54, 2, "Aadhaar Card", "9823-4412-8871"),
+        (user_map["anand@provider.com"], "Carpenter", 10, 200.0, "Busy", "Verified", 16.3475, 81.0430, "Wood Works Lane, Main Bazaar, Gudlavalleru", "Expert wood artisan for teakwood doors, lock replacement, almirah repairs and window frames in Gudlavalleru.", 4.7, 19, 32, 3, "Panchayat Artisan Registration", "PAN-ART-GDL-0082"),
+        (user_map["ravi@provider.com"], "Mechanic", 12, 180.0, "Available", "Verified", 16.3580, 81.0510, "College Road Junction Garage, Near SRGEC, Gudlavalleru", "On-spot puncture repair, tractor hydraulic checks, two-wheeler engine tuning near SRGEC campus.", 4.9, 52, 110, 4, "Driving License", "AP16-2012-0049281"),
+        (user_map["shiva@provider.com"], "Appliance Repair", 6, 200.0, "Available", "Verified", 16.3450, 81.0460, "Opp. ZP High School, Gudlavalleru", "Refrigerator gas charging, cooler fan repair, ceiling fan winding and washing machine servicing in Gudlavalleru.", 4.6, 14, 28, 1, "Aadhaar Card", "6734-9012-4412"),
         
         # Gudivada Providers (~12 km)
-        (user_map["kishore@provider.com"], "Electrician", 9, 160.0, "Available", "Verified", 16.4420, 80.9940, "Nehru Chowk, Eluru Road, Gudivada - 521301", "Industrial motor rewinding, commercial shop wiring, and 3-phase pump starters in Gudivada area.", 4.8, 44, 98, 3),
-        (user_map["krishna@provider.com"], "Plumber", 7, 150.0, "Available", "Verified", 16.4380, 80.9910, "RTC Complex Road, Gudivada - 521301", "Sanitary line unclogging, bathroom pipeline fittings, and rooftop overhead tank float valves in Gudivada.", 4.9, 31, 67, 2),
-        (user_map["venkat.auto@provider.com"], "Mechanic", 11, 200.0, "Available", "Verified", 16.4450, 80.9960, "Bhimavaram Bypass Road, Gudivada - 521301", "24/7 highway breakdown assistance, tractor clutch repairs and bike engine servicing in Gudivada.", 4.7, 58, 142, 4),
+        (user_map["kishore@provider.com"], "Electrician", 9, 160.0, "Available", "Verified", 16.4420, 80.9940, "Nehru Chowk, Eluru Road, Gudivada - 521301", "Industrial motor rewinding, commercial shop wiring, and 3-phase pump starters in Gudivada area.", 4.8, 44, 98, 3, "Trade License / ITI Certificate", "ITI-GDV-2014-99"),
+        (user_map["krishna@provider.com"], "Plumber", 7, 150.0, "Available", "Verified", 16.4380, 80.9910, "RTC Complex Road, Gudivada - 521301", "Sanitary line unclogging, bathroom pipeline fittings, and rooftop overhead tank float valves in Gudivada.", 4.9, 31, 67, 2, "Aadhaar Card", "7712-3490-1288"),
+        (user_map["venkat.auto@provider.com"], "Mechanic", 11, 200.0, "Available", "Verified", 16.4450, 80.9960, "Bhimavaram Bypass Road, Gudivada - 521301", "24/7 highway breakdown assistance, tractor clutch repairs and bike engine servicing in Gudivada.", 4.7, 58, 142, 4, "Driving License", "AP16-2010-0081299"),
 
         # Machilipatnam Providers (~26 km)
-        (user_map["coastal@provider.com"], "Appliance Repair", 10, 220.0, "Available", "Verified", 16.1890, 81.1400, "Robertsonpet Main Road, Machilipatnam - 521001", "Split AC duct cleaning, commercial deep freezer maintenance, and inverter servicing in Machilipatnam.", 4.8, 36, 75, 3),
-        (user_map["durga@provider.com"], "Mechanic", 14, 200.0, "Available", "Verified", 16.1850, 81.1350, "Near Old Bus Stand & Port Road, Machilipatnam - 521001", "Marine boat engine tuning, agricultural tiller servicing, and auto breakdown help in Machilipatnam.", 4.9, 64, 180, 5),
+        (user_map["coastal@provider.com"], "Appliance Repair", 10, 220.0, "Available", "Verified", 16.1890, 81.1400, "Robertsonpet Main Road, Machilipatnam - 521001", "Split AC duct cleaning, commercial deep freezer maintenance, and inverter servicing in Machilipatnam.", 4.8, 36, 75, 3, "Trade License / ITI Certificate", "AC-TECH-MTM-2015"),
+        (user_map["durga@provider.com"], "Mechanic", 14, 200.0, "Available", "Verified", 16.1850, 81.1350, "Near Old Bus Stand & Port Road, Machilipatnam - 521001", "Marine boat engine tuning, agricultural tiller servicing, and auto breakdown help in Machilipatnam.", 4.9, 64, 180, 5, "Trade License / ITI Certificate", "MECH-MTM-2009-12"),
+
+        # Pending Verification Provider Applicant for Admin Approval Testing
+        (user_map["kalyan@provider.com"], "Painter", 4, 220.0, "Available", "Pending", 16.3490, 81.0450, "Panchayat Office Lane, Gudlavalleru - 521356", "Skilled wall painter and texture designer with 4 years experience across Gudlavalleru and nearby villages.", 5.0, 0, 0, 0, "Aadhaar Card", "4829-1092-3847"),
     ]
 
     cur.executemany("""
-    INSERT INTO providers (user_id, category, experience_years, charges_per_hr, availability, verification_status, latitude, longitude, address, bio, rating, rating_count, completed_jobs_count, years_on_platform)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    INSERT INTO providers (user_id, category, experience_years, charges_per_hr, availability, verification_status, latitude, longitude, address, bio, rating, rating_count, completed_jobs_count, years_on_platform, id_proof_type, id_proof_number)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     """, providers_data)
 
     print("Seeding Pharmacies...")

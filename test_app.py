@@ -323,6 +323,108 @@ class LocalServeTestCase(unittest.TestCase):
         self.assertEqual(vols_res.status_code, 200)
         self.assertIn(b'Community Volunteers', vols_res.data)
 
+    def test_separate_logins_and_portals(self):
+        """Verify distinct login portals for Customer, Provider, Pharmacy, and Admin."""
+        for role in ['customer', 'provider', 'pharmacy', 'admin']:
+            res = self.client.get(f'/login/{role}')
+            self.assertEqual(res.status_code, 200)
+            self.assertIn(b'Select Your Portal', res.data)
+
+        # Direct provider registration view
+        reg_prov = self.client.get('/register/provider')
+        self.assertEqual(reg_prov.status_code, 200)
+        self.assertIn(b'Identity / Trade Proof Type', reg_prov.data)
+        self.assertIn(b'Admin Approval Notice', reg_prov.data)
+
+    def test_provider_registration_pending_and_admin_approval_flow(self):
+        """Verify provider registers with pending status and requires admin approval to appear publicly."""
+        # 1. Register new provider
+        reg_res = self.client.post('/register', data={
+            'name': 'Brahmaiah Borewell Tech',
+            'email': 'brahmaiah@borewell.com',
+            'phone': '+91 9848554433',
+            'password': 'password123',
+            'role': 'provider',
+            'category': 'Plumber',
+            'experience_years': '6',
+            'charges_per_hr': '180',
+            'id_proof_type': 'Trade License / ITI Certificate',
+            'id_proof_number': 'ITI-PLUMB-GDL-2018',
+            'bio': 'Submersible borewell motors and agriculture pipeline installations.',
+            'address': 'Kavutaram Road, Gudlavalleru - 521356',
+            'latitude': 16.3500,
+            'longitude': 81.0460
+        }, follow_redirects=True)
+        self.assertEqual(reg_res.status_code, 200)
+
+        with self.app.app_context():
+            p = query_db("SELECT * FROM providers p JOIN users u ON p.user_id = u.user_id WHERE u.email = 'brahmaiah@borewell.com'", one=True)
+            self.assertIsNotNone(p)
+            self.assertEqual(p['verification_status'], 'Pending')
+            self.assertEqual(p['id_proof_type'], 'Trade License / ITI Certificate')
+            self.assertEqual(p['id_proof_number'], 'ITI-PLUMB-GDL-2018')
+            prov_id = p['provider_id']
+
+        # 2. Public /services query must NOT show unverified pending provider
+        serv_res = self.client.get('/services?category=Plumber&radius=30')
+        self.assertNotIn(b'Brahmaiah Borewell Tech', serv_res.data)
+
+        # 3. Admin logs in and approves provider
+        self.client.get('/quick-login/admin')
+        admin_dash = self.client.get('/admin/dashboard')
+        self.assertEqual(admin_dash.status_code, 200)
+        self.assertIn(b'Brahmaiah Borewell Tech', admin_dash.data)
+
+        approve_res = self.client.post(f'/admin/provider/{prov_id}/status', data={
+            'status': 'Verified'
+        }, follow_redirects=True)
+        self.assertEqual(approve_res.status_code, 200)
+
+        with self.app.app_context():
+            updated = query_db("SELECT verification_status FROM providers WHERE provider_id = ?", (prov_id,), one=True)
+            self.assertEqual(updated['verification_status'], 'Verified')
+
+        # 4. Now verified provider MUST appear publicly on /services within 30 km
+        serv_res_after = self.client.get('/services?category=Plumber&radius=30')
+        self.assertIn(b'Brahmaiah Borewell Tech', serv_res_after.data)
+
+    def test_location_geocoding_and_30km_radius(self):
+        """Verify geocoding API, location switching, and 30 km radius queries."""
+        # 1. Geocode lookup for Gudivada
+        geo_res = self.client.get('/api/geocode?q=Gudivada')
+        self.assertEqual(geo_res.status_code, 200)
+        geo_data = json.loads(geo_res.data)
+        self.assertEqual(geo_data['status'], 'success')
+        self.assertGreater(len(geo_data['results']), 0)
+        self.assertEqual(geo_data['results'][0]['name'], 'Gudivada')
+
+        # 2. Geocode lookup by Pincode 521356
+        pin_res = self.client.get('/api/geocode?q=521356')
+        self.assertEqual(pin_res.status_code, 200)
+        pin_data = json.loads(pin_res.data)
+        self.assertEqual(pin_data['results'][0]['name'], 'Gudlavalleru')
+
+        # 3. Set custom location via POST /api/set-location
+        set_res = self.client.post('/api/set-location', json={
+            'lat': 16.4410,
+            'lng': 80.9926,
+            'name': 'Gudivada Town'
+        })
+        self.assertEqual(set_res.status_code, 200)
+        set_data = json.loads(set_res.data)
+        self.assertEqual(set_data['status'], 'success')
+        self.assertEqual(set_data['radius'], 30.0)
+
+        # 4. Nearby providers within 30 km radius
+        near_res = self.client.get('/api/providers/nearby?lat=16.4410&lng=80.9926&radius=30')
+        self.assertEqual(near_res.status_code, 200)
+        near_data = json.loads(near_res.data)
+        self.assertGreater(near_data['count'], 0)
+        # Should include both Gudivada providers (0 km) and Gudlavalleru providers (~12 km < 30 km)
+        provider_names = [p['name'] for p in near_data['providers']]
+        self.assertTrue(any('Gudivada' in name for name in provider_names))
+        self.assertTrue(any('Ramesh Electrician' in name for name in provider_names))
+
 if __name__ == '__main__':
     unittest.main()
 

@@ -49,6 +49,26 @@
     </div>
   </div>
 
+  <!-- Pending Approvals Attention Banner -->
+  {% if stats.pending_providers > 0 %}
+  <div class="alert alert-warning p-3 rounded-4 shadow-sm border border-warning d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="fs-2 text-warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div>
+        <h6 class="fw-bold text-dark mb-0">
+          {{ stats.pending_providers }} Service Provider Application(s) Awaiting Panchayat Approval
+        </h6>
+        <div class="small text-muted">
+          New technicians registered with ID proof and trade details need verification before appearing in citizen search (30 km radius).
+        </div>
+      </div>
+    </div>
+    <a href="#providersTab" class="btn btn-warning btn-sm text-dark fw-bold px-3 py-2 shadow-sm" onclick="document.querySelector('#adminTabs button[data-bs-target=\'#providersTab\']').click()">
+      <i class="fa-solid fa-user-check me-1"></i> Review Applications Now
+    </a>
+  </div>
+  {% endif %}
+
   <!-- Tabs Navigation -->
   <ul class="nav nav-pills mb-4 gap-2" id="adminTabs" role="tablist">
     <li class="nav-item">
@@ -91,6 +111,7 @@
               <tr>
                 <th>Provider Name</th>
                 <th>Category & Rate</th>
+                <th>Trade & ID Proof</th>
                 <th>Contact & Location</th>
                 <th>Current Status</th>
                 <th>Verification Actions</th>
@@ -98,7 +119,7 @@
             </thead>
             <tbody>
               {% for p in providers %}
-              <tr>
+              <tr {% if p.verification_status == 'Pending' %}class="table-warning bg-opacity-25"{% endif %}>
                 <td>
                   <span class="fw-bold text-dark">{{ p.name }}</span>
                   <div class="text-muted small">Registered: {{ p.registered_date|timeago }}</div>
@@ -108,6 +129,10 @@
                   <div class="small text-muted">₹{{ p.charges_per_hr }}/hr &bull; {{ p.experience_years }} yrs exp</div>
                 </td>
                 <td>
+                  <div class="small fw-bold text-secondary">{{ p.id_proof_type|default('Aadhaar / Trade Card') }}</div>
+                  <div class="font-monospace small text-dark">{{ p.id_proof_number|default('Verified on Record') }}</div>
+                </td>
+                <td>
                   <div><i class="fa-solid fa-phone small text-secondary"></i> {{ p.phone }}</div>
                   <div class="small text-muted text-truncate" style="max-width: 200px;">{{ p.address }}</div>
                 </td>
@@ -115,27 +140,30 @@
                   {% if p.verification_status == 'Verified' %}
                     <span class="provider-badge-verified"><i class="fa-solid fa-check"></i> Verified</span>
                   {% elif p.verification_status == 'Pending' %}
-                    <span class="provider-badge-pending"><i class="fa-solid fa-clock"></i> Pending</span>
+                    <span class="provider-badge-pending"><i class="fa-solid fa-clock"></i> Pending Approval</span>
                   {% elif p.verification_status == 'Suspended' %}
                     <span class="badge bg-danger">Suspended</span>
                   {% else %}
                     <span class="badge bg-secondary">Rejected</span>
+                    {% if p.rejection_reason %}
+                      <div class="small text-danger mt-1" style="max-width: 150px;">{{ p.rejection_reason }}</div>
+                    {% endif %}
                   {% endif %}
                 </td>
                 <td>
-                  <form action="{{ url_for('admin.update_provider_status', provider_id=p.provider_id) }}" method="POST" class="d-flex gap-1">
+                  <form action="{{ url_for('admin.update_provider_status', provider_id=p.provider_id) }}" method="POST" class="d-flex gap-1 flex-wrap">
                     {% if p.verification_status != 'Verified' %}
-                      <button type="submit" name="status" value="Verified" class="btn btn-sm btn-success" title="Approve as Verified">
+                      <button type="submit" name="status" value="Verified" class="btn btn-sm btn-success fw-bold" title="Approve and publish provider to 30 km radius">
                         <i class="fa-solid fa-check"></i> Approve
                       </button>
                     {% endif %}
                     {% if p.verification_status != 'Rejected' %}
-                      <button type="submit" name="status" value="Rejected" class="btn btn-sm btn-outline-danger" title="Reject">
+                      <button type="submit" name="status" value="Rejected" class="btn btn-sm btn-outline-danger" title="Reject Application">
                         Reject
                       </button>
                     {% endif %}
                     {% if p.verification_status != 'Suspended' %}
-                      <button type="submit" name="status" value="Suspended" class="btn btn-sm btn-warning" title="Suspend">
+                      <button type="submit" name="status" value="Suspended" class="btn btn-sm btn-warning" title="Suspend Account">
                         Suspend
                       </button>
                     {% endif %}

@@ -30,13 +30,29 @@ def role_required(allowed_roles):
     return decorator
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
-def login():
+@auth_bp.route('/login/<role>', methods=['GET', 'POST'])
+def login(role=None):
+    current_role = role or request.args.get('role', 'customer')
+    if current_role not in ['customer', 'provider', 'pharmacy', 'admin']:
+        current_role = 'customer'
+
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
+        portal_role = request.form.get('portal_role', current_role)
         
         user = query_db("SELECT * FROM users WHERE LOWER(email) = ?", (email,), one=True)
         if user and check_password_hash(user['password_hash'], password):
+            # Optional role guidance if accessing mismatched portal
+            if portal_role and portal_role != user['role']:
+                user_role_names = {
+                    'customer': 'Customer',
+                    'provider': 'Service Provider',
+                    'pharmacy': 'Pharmacy Partner',
+                    'admin': 'Platform Administrator'
+                }
+                flash(f"Note: This account is registered as a {user_role_names.get(user['role'], 'user')}. Directing you to your dashboard.", 'info')
+
             session.clear()
             session['user_id'] = user['user_id']
             session['user_name'] = user['name']
@@ -46,12 +62,14 @@ def login():
             session['user_lng'] = user['longitude'] or Config.DEFAULT_LNG
             session['user_phone'] = user['phone']
 
-            # If provider, cache provider_id
+            # If provider, cache provider_id and verification_status
             if user['role'] == 'provider':
                 p = query_db("SELECT provider_id, verification_status FROM providers WHERE user_id = ?", (user['user_id'],), one=True)
                 if p:
                     session['provider_id'] = p['provider_id']
                     session['provider_status'] = p['verification_status']
+                    if p['verification_status'] == 'Pending':
+                        flash('Your Service Provider profile is pending Administrator verification before public listing.', 'info')
                 return redirect(url_for('provider.dashboard'))
 
             # If pharmacy, cache pharmacy_id
@@ -72,7 +90,7 @@ def login():
         else:
             flash('Invalid email or password. Please try again.', 'danger')
 
-    return render_template('login.html')
+    return render_template('login.html', current_role=current_role)
 
 @auth_bp.route('/quick-login/<role>')
 def quick_login(role):
@@ -122,14 +140,19 @@ def quick_login(role):
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
-def register():
+@auth_bp.route('/register/<role>', methods=['GET', 'POST'])
+def register(role=None):
+    current_role = role or request.args.get('role', 'customer')
+    if current_role not in ['customer', 'provider', 'pharmacy']:
+        current_role = 'customer'
     services = query_db("SELECT * FROM services ORDER BY name ASC")
+
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip().lower()
         phone = request.form.get('phone', '').strip()
         password = request.form.get('password', '')
-        role = request.form.get('role', 'customer')
+        user_role = request.form.get('role', current_role)
         address = request.form.get('address', '').strip()
         latitude = request.form.get('latitude', Config.DEFAULT_LAT)
         longitude = request.form.get('longitude', Config.DEFAULT_LNG)
@@ -144,29 +167,39 @@ def register():
         existing = query_db("SELECT user_id FROM users WHERE LOWER(email) = ?", (email,), one=True)
         if existing:
             flash('An account with this email already exists. Please login.', 'warning')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login', role=user_role))
 
         pwd_hash = generate_password_hash(password)
         user_id = execute_db("""
             INSERT INTO users (name, email, phone, password_hash, role, latitude, longitude, address)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (name, email, phone, pwd_hash, role, latitude, longitude, address))
+        """, (name, email, phone, pwd_hash, user_role, latitude, longitude, address))
 
-        # Handle Provider specific fields
-        if role == 'provider':
+        # Handle Provider specific fields (Strict Pending Verification)
+        if user_role == 'provider':
             category = request.form.get('category', 'Electrician')
             experience = int(request.form.get('experience_years', 2))
             charges = float(request.form.get('charges_per_hr', 150))
-            bio = request.form.get('bio', '')
+            bio = request.form.get('bio', '').strip()
+            id_proof_type = request.form.get('id_proof_type', 'Aadhaar Card')
+            id_proof_number = request.form.get('id_proof_number', '').strip()
 
             execute_db("""
-                INSERT INTO providers (user_id, category, experience_years, charges_per_hr, availability, verification_status, latitude, longitude, address, bio)
-                VALUES (?, ?, ?, ?, 'Available', 'Pending', ?, ?, ?, ?)
-            """, (user_id, category, experience, charges, latitude, longitude, address, bio))
-            flash('Provider registration submitted! Account is pending admin verification.', 'success')
+                INSERT INTO providers (user_id, category, experience_years, charges_per_hr, availability, verification_status, latitude, longitude, address, bio, id_proof_type, id_proof_number)
+                VALUES (?, ?, ?, ?, 'Available', 'Pending', ?, ?, ?, ?, ?, ?)
+            """, (user_id, category, experience, charges, latitude, longitude, address, bio, id_proof_type, id_proof_number))
+            
+            # Add welcome notification to provider
+            execute_db("""
+                INSERT INTO notifications (user_id, title, message)
+                VALUES (?, 'Registration Under Review', 'Your Service Provider profile has been submitted. The Administrator will review your trade details and approve your listing.')
+            """, (user_id,))
+
+            flash('Provider registration submitted! Your account is pending Administrator review and approval before public listing.', 'success')
+            return redirect(url_for('auth.login', role='provider'))
 
         # Handle Pharmacy specific fields
-        elif role == 'pharmacy':
+        elif user_role == 'pharmacy':
             pharmacy_name = request.form.get('pharmacy_name', name)
             timings = request.form.get('timings', '8:00 AM - 10:00 PM')
 
@@ -175,13 +208,13 @@ def register():
                 VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?)
             """, (user_id, pharmacy_name, phone, address, latitude, longitude, timings))
             flash('Pharmacy registered successfully! Account is pending admin verification.', 'success')
+            return redirect(url_for('auth.login', role='pharmacy'))
 
         else:
-            flash('Customer registration successful! Please login.', 'success')
+            flash('Customer registration successful! Please login to book services.', 'success')
+            return redirect(url_for('auth.login', role='customer'))
 
-        return redirect(url_for('auth.login'))
-
-    return render_template('register.html', services=services)
+    return render_template('register.html', services=services, current_role=current_role)
 
 @auth_bp.route('/logout')
 def logout():

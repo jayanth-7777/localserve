@@ -5,60 +5,212 @@
 {% block content %}
 <div class="container py-4">
   <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
+    <div class="col-md-7 col-lg-6">
 
+      <!-- Login Card -->
       <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border mb-4">
+        
+        <!-- Portal Header -->
         <div class="text-center mb-4">
-          <div class="service-icon-box bg-primary bg-opacity-10 text-primary mb-2" style="width: 60px; height: 60px;">
+          <div id="portalIcon" class="service-icon-box bg-primary bg-opacity-10 text-primary mx-auto mb-2" style="width: 64px; height: 64px;">
             <i class="fa-solid fa-right-to-bracket fs-3"></i>
           </div>
-          <h3 class="fw-bold text-dark">Account Login</h3>
-          <p class="text-muted small">Sign in to access your local community dashboard</p>
+          <h3 id="portalHeading" class="fw-bold text-dark mb-1">Citizen & Customer Portal</h3>
+          <p id="portalSubheading" class="text-muted small mb-0">Sign in to book local services and order medicines in your village</p>
         </div>
 
-        <form action="{{ url_for('auth.login', next=request.args.get('next')) }}" method="POST">
+        <!-- Role Selector Tabs -->
+        <div class="mb-4">
+          <label class="form-label fw-bold small text-uppercase text-secondary mb-2">Select Your Portal:</label>
+          <div class="nav nav-pills nav-fill bg-light p-1 rounded-3 border" id="loginRoleTabs" role="tablist">
+            <button class="nav-link py-2 fw-bold text-nowrap {% if current_role == 'customer' %}active{% endif %}"
+                    type="button" onclick="selectLoginPortal('customer')">
+              <i class="fa-solid fa-user me-1"></i> Citizen
+            </button>
+            <button class="nav-link py-2 fw-bold text-nowrap {% if current_role == 'provider' %}active{% endif %}"
+                    type="button" onclick="selectLoginPortal('provider')">
+              <i class="fa-solid fa-screwdriver-wrench me-1"></i> Provider
+            </button>
+            <button class="nav-link py-2 fw-bold text-nowrap {% if current_role == 'pharmacy' %}active{% endif %}"
+                    type="button" onclick="selectLoginPortal('pharmacy')">
+              <i class="fa-solid fa-prescription-bottle-medical me-1"></i> Pharmacy
+            </button>
+            <button class="nav-link py-2 fw-bold text-nowrap {% if current_role == 'admin' %}active{% endif %}"
+                    type="button" onclick="selectLoginPortal('admin')">
+              <i class="fa-solid fa-shield-halved me-1"></i> Admin
+            </button>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form action="{{ url_for('auth.login', next=request.args.get('next')) }}" method="POST" id="portalLoginForm">
+          <input type="hidden" name="portal_role" id="portalRoleInput" value="{{ current_role }}">
+
           <div class="mb-3">
-            <label class="form-label fw-bold small">Email Address</label>
-            <input type="email" name="email" class="form-control" required placeholder="name@example.com">
+            <label class="form-label fw-bold small" id="emailLabel">Email Address / User ID</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-envelope"></i></span>
+              <input type="email" name="email" id="loginEmailInput" class="form-control" required placeholder="name@example.com">
+            </div>
           </div>
 
           <div class="mb-3">
             <label class="form-label fw-bold small">Password</label>
-            <input type="password" name="password" class="form-control" required placeholder="••••••••">
+            <div class="input-group">
+              <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-lock"></i></span>
+              <input type="password" name="password" id="loginPasswordInput" class="form-control" required placeholder="••••••••">
+            </div>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-3">
-            <i class="fa-solid fa-lock-open me-1"></i> Sign In
+          <!-- Dynamic Role Guidance Banner -->
+          <div id="roleHelpBanner" class="p-2 mb-3 rounded-3 small bg-light text-muted border d-flex align-items-center gap-2">
+            <i class="fa-solid fa-info-circle text-primary"></i>
+            <span id="roleHelpText">Citizens can book trusted local plumbers, electricians, carpenters, mechanics and order emergency medicines.</span>
+          </div>
+
+          <button type="submit" id="submitBtn" class="btn btn-primary w-100 fw-bold py-2 mb-3 shadow-sm">
+            <i class="fa-solid fa-right-to-bracket me-1"></i> <span id="submitBtnText">Sign In to Citizen Portal</span>
           </button>
         </form>
 
-        <div class="text-center small text-muted">
-          Don't have an account? <a href="{{ url_for('auth.register') }}" class="fw-bold">Register here</a>
+        <!-- Contextual Registration Link -->
+        <div class="text-center small text-muted" id="registerSection">
+          <span id="registerPrompt">Don't have an account?</span>
+          <a href="{{ url_for('auth.register', role=current_role) }}" class="fw-bold ms-1" id="registerLink">
+            Register here
+          </a>
         </div>
       </div>
 
-      <!-- Quick 1-Click Demo Login Selector for Evaluation -->
-      <div class="p-3 bg-light rounded-4 border">
-        <div class="small fw-bold text-secondary mb-2 text-center text-uppercase">
-          <i class="fa-solid fa-flask text-warning me-1"></i> Quick 1-Click Role Switch (Demo Mode)
-        </div>
-        <div class="d-grid gap-2">
-          <a href="{{ url_for('auth.quick_login', role='customer') }}" class="btn btn-outline-primary btn-sm text-start">
-            <i class="fa-solid fa-user me-2"></i> <b>Customer:</b> Venkata Rao (Gandhi Bomma St, Gudlavalleru)
-          </a>
-          <a href="{{ url_for('auth.quick_login', role='provider') }}" class="btn btn-outline-warning btn-sm text-start text-dark">
-            <i class="fa-solid fa-bolt me-2 text-warning"></i> <b>Service Provider:</b> Ramesh Electrician (Substation Rd)
-          </a>
-          <a href="{{ url_for('auth.quick_login', role='pharmacy') }}" class="btn btn-outline-success btn-sm text-start">
-            <i class="fa-solid fa-prescription me-2 text-success"></i> <b>Pharmacy:</b> Balaji Medical (RTC Bus Stand Rd)
-          </a>
-          <a href="{{ url_for('auth.quick_login', role='admin') }}" class="btn btn-outline-danger btn-sm text-start">
-            <i class="fa-solid fa-user-shield me-2 text-danger"></i> <b>Gram Panchayat Admin:</b> Gudlavalleru Officer
-          </a>
+      <!-- Collapsible Evaluator / Demo Role Quick Switcher -->
+      <div class="accordion border-0 shadow-sm rounded-4 overflow-hidden" id="demoAccordion">
+        <div class="accordion-item border">
+          <h2 class="accordion-header" id="headingDemo">
+            <button class="accordion-button collapsed py-2 px-3 bg-light text-secondary small fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDemo">
+              <i class="fa-solid fa-flask text-warning me-2"></i> Evaluator / Demo 1-Click Role Switcher (Click to Test)
+            </button>
+          </h2>
+          <div id="collapseDemo" class="accordion-collapse collapse" data-bs-parent="#demoAccordion">
+            <div class="accordion-body p-3 bg-white">
+              <p class="small text-muted mb-2">Test all platform personas instantly without typing passwords:</p>
+              <div class="d-grid gap-2">
+                <a href="{{ url_for('auth.quick_login', role='customer') }}" class="btn btn-outline-primary btn-sm text-start">
+                  <i class="fa-solid fa-user me-2"></i> <b>Citizen:</b> Venkata Rao (Gandhi Bomma St, Gudlavalleru)
+                </a>
+                <a href="{{ url_for('auth.quick_login', role='provider') }}" class="btn btn-outline-warning btn-sm text-start text-dark">
+                  <i class="fa-solid fa-bolt me-2 text-warning"></i> <b>Service Provider:</b> Ramesh Electrician (Substation Rd)
+                </a>
+                <a href="{{ url_for('auth.quick_login', role='pharmacy') }}" class="btn btn-outline-success btn-sm text-start">
+                  <i class="fa-solid fa-prescription me-2 text-success"></i> <b>Pharmacy:</b> Balaji Medical (RTC Bus Stand Rd)
+                </a>
+                <a href="{{ url_for('auth.quick_login', role='admin') }}" class="btn btn-outline-danger btn-sm text-start">
+                  <i class="fa-solid fa-user-shield me-2 text-danger"></i> <b>Gram Panchayat Admin:</b> Gudlavalleru Officer
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const portalConfigs = {
+    customer: {
+      title: 'Citizen & Customer Portal',
+      desc: 'Sign in to book local services and order medicines in your village',
+      iconClass: 'fa-user',
+      iconBg: 'bg-primary bg-opacity-10 text-primary',
+      btnClass: 'btn-primary',
+      btnText: 'Sign In to Citizen Portal',
+      help: 'Citizens can book trusted local plumbers, electricians, carpenters, mechanics and order emergency medicines.',
+      canRegister: true,
+      registerUrl: "{{ url_for('auth.register', role='customer') }}",
+      registerText: 'Register as New Customer'
+    },
+    provider: {
+      title: 'Service Provider & Technician Portal',
+      desc: 'Manage service requests, schedule repairs, track earnings and mentor learners',
+      iconClass: 'fa-screwdriver-wrench',
+      iconBg: 'bg-warning bg-opacity-25 text-dark',
+      btnClass: 'btn-warning text-dark',
+      btnText: 'Sign In to Provider Portal',
+      help: 'Service providers must be approved by the Gram Panchayat Administrator before appearing in search results.',
+      canRegister: true,
+      registerUrl: "{{ url_for('auth.register', role='provider') }}",
+      registerText: 'Register as Service Provider'
+    },
+    pharmacy: {
+      title: 'Pharmacy Partner Portal',
+      desc: 'Receive digital prescriptions, manage medicine stock & respond to patient inquiries',
+      iconClass: 'fa-prescription-bottle-medical',
+      iconBg: 'bg-success bg-opacity-10 text-success',
+      btnClass: 'btn-success',
+      btnText: 'Sign In to Pharmacy Portal',
+      help: 'Pharmacies broadcast live medicine availability and respond to community prescription uploads.',
+      canRegister: true,
+      registerUrl: "{{ url_for('auth.register', role='pharmacy') }}",
+      registerText: 'Register New Pharmacy Store'
+    },
+    admin: {
+      title: 'Gram Panchayat Admin Console',
+      desc: 'Review provider approvals, verify credentials, manage complaints & notices',
+      iconClass: 'fa-shield-halved',
+      iconBg: 'bg-danger bg-opacity-10 text-danger',
+      btnClass: 'btn-danger',
+      btnText: 'Sign In to Admin Console',
+      help: 'Restricted to authorized Gram Panchayat Officers and Municipal Administrators.',
+      canRegister: false,
+      registerUrl: '#',
+      registerText: ''
+    }
+  };
+
+  function selectLoginPortal(role) {
+    const config = portalConfigs[role] || portalConfigs.customer;
+    document.getElementById('portalRoleInput').value = role;
+
+    // Update active tab buttons
+    const tabButtons = document.querySelectorAll('#loginRoleTabs .nav-link');
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    const clickedTab = Array.from(tabButtons).find(b => b.textContent.toLowerCase().includes(role === 'provider' ? 'provider' : role === 'pharmacy' ? 'pharmacy' : role === 'admin' ? 'admin' : 'citizen'));
+    if (clickedTab) clickedTab.classList.add('active');
+
+    // Update headings and icons
+    document.getElementById('portalHeading').textContent = config.title;
+    document.getElementById('portalSubheading').textContent = config.desc;
+    
+    const iconDiv = document.getElementById('portalIcon');
+    iconDiv.className = `service-icon-box ${config.iconBg} mx-auto mb-2`;
+    iconDiv.innerHTML = `<i class="fa-solid ${config.iconClass} fs-3"></i>`;
+
+    // Update submit button
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.className = `btn ${config.btnClass} w-100 fw-bold py-2 mb-3 shadow-sm`;
+    document.getElementById('submitBtnText').textContent = config.btnText;
+
+    // Update role help
+    document.getElementById('roleHelpText').textContent = config.help;
+
+    // Update register link
+    const regSection = document.getElementById('registerSection');
+    if (config.canRegister) {
+      regSection.classList.remove('d-none');
+      document.getElementById('registerLink').href = config.registerUrl;
+      document.getElementById('registerLink').textContent = config.registerText;
+    } else {
+      regSection.classList.add('d-none');
+    }
+  }
+
+  // Initialize selected portal on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    const initialRole = "{{ current_role|default('customer') }}";
+    selectLoginPortal(initialRole);
+  });
+</script>
 {% endblock %}

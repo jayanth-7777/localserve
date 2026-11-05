@@ -1,3 +1,6 @@
+import json
+import urllib.request
+import urllib.parse
 from flask import Blueprint, request, jsonify, session
 from database import query_db, execute_db, haversine
 from utils import time_ago
@@ -5,22 +8,133 @@ from config import Config
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
+# Regional & Indian Pre-cached Location Geocoding Directory
+LOCATION_KNOWLEDGE_BASE = [
+    {"name": "Gudlavalleru", "telugu_name": "గుడ్లవల్లేరు", "pincode": "521356", "lat": 16.3486, "lng": 81.0442, "district": "Krishna", "state": "Andhra Pradesh"},
+    {"name": "Gudivada", "telugu_name": "గుడివాడ", "pincode": "521301", "lat": 16.4410, "lng": 80.9926, "district": "Krishna", "state": "Andhra Pradesh"},
+    {"name": "Machilipatnam", "telugu_name": "మచిలీపట్నం", "pincode": "521001", "lat": 16.1875, "lng": 81.1389, "district": "Krishna", "state": "Andhra Pradesh"},
+    {"name": "Vijayawada", "telugu_name": "విజయవాడ", "pincode": "520001", "lat": 16.5062, "lng": 80.6480, "district": "NTR", "state": "Andhra Pradesh"},
+    {"name": "Pamarru", "telugu_name": "పామర్రు", "pincode": "521157", "lat": 16.3312, "lng": 80.9634, "district": "Krishna", "state": "Andhra Pradesh"},
+    {"name": "Hanuman Junction", "telugu_name": "హనుమాన్ జంక్షన్", "pincode": "521105", "lat": 16.6341, "lng": 80.9576, "district": "Krishna", "state": "Andhra Pradesh"},
+    {"name": "Vuyyuru", "telugu_name": "వుయ్యూరు", "pincode": "521165", "lat": 16.3687, "lng": 80.8440, "district": "Krishna", "state": "Andhra Pradesh"},
+    {"name": "Challapalli", "telugu_name": "చల్లపల్లి", "pincode": "521126", "lat": 16.1189, "lng": 80.9328, "district": "Krishna", "state": "Andhra Pradesh"},
+    {"name": "Avanigadda", "telugu_name": "అవనిగడ్డ", "pincode": "521121", "lat": 16.0215, "lng": 80.9192, "district": "Krishna", "state": "Andhra Pradesh"},
+    {"name": "Eluru", "telugu_name": "ఏలూరు", "pincode": "534001", "lat": 16.7107, "lng": 81.0952, "district": "Eluru", "state": "Andhra Pradesh"},
+    {"name": "Bhimavaram", "telugu_name": "భీమవరం", "pincode": "534201", "lat": 16.5449, "lng": 81.5212, "district": "West Godavari", "state": "Andhra Pradesh"},
+    {"name": "Guntur", "telugu_name": "గుంటూరు", "pincode": "522002", "lat": 16.3067, "lng": 80.4365, "district": "Guntur", "state": "Andhra Pradesh"},
+    {"name": "Tenali", "telugu_name": "తెనాలి", "pincode": "522201", "lat": 16.2437, "lng": 80.6400, "district": "Guntur", "state": "Andhra Pradesh"},
+    {"name": "Mangalagiri", "telugu_name": "మంగళగిరి", "pincode": "522503", "lat": 16.4326, "lng": 80.5694, "district": "Guntur", "state": "Andhra Pradesh"},
+    {"name": "Visakhapatnam", "telugu_name": "విశాఖపట్నం", "pincode": "530001", "lat": 17.6868, "lng": 83.2185, "district": "Visakhapatnam", "state": "Andhra Pradesh"},
+    {"name": "Tirupati", "telugu_name": "తిరుపతి", "pincode": "517501", "lat": 13.6288, "lng": 79.4192, "district": "Tirupati", "state": "Andhra Pradesh"},
+    {"name": "Hyderabad", "telugu_name": "హైదరాబాద్", "pincode": "500001", "lat": 17.3850, "lng": 78.4867, "district": "Hyderabad", "state": "Telangana"},
+]
+
+def reverse_lookup_nearest_place(lat, lng):
+    """Find closest place name to coordinates in local knowledge base."""
+    closest = None
+    min_dist = float('inf')
+    for loc in LOCATION_KNOWLEDGE_BASE:
+        d = haversine(lat, lng, loc['lat'], loc['lng'])
+        if d < min_dist:
+            min_dist = d
+            closest = loc
+    if closest and min_dist <= 25.0:
+        return f"{closest['name']} ({closest['pincode']})"
+    return f"Location ({lat:.3f}, {lng:.3f})"
+
 @api_bp.route('/set-location', methods=['POST'])
 def set_location():
     data = request.get_json() or {}
     lat = data.get('lat')
     lng = data.get('lng')
+    name = data.get('name')
+    
     if lat is not None and lng is not None:
         try:
-            session['user_lat'] = float(lat)
-            session['user_lng'] = float(lng)
+            lat_f = float(lat)
+            lng_f = float(lng)
+            session['user_lat'] = lat_f
+            session['user_lng'] = lng_f
+            
+            # Auto-resolve place name if not supplied
+            resolved_name = name or reverse_lookup_nearest_place(lat_f, lng_f)
+            session['location_name'] = resolved_name
+            session['active_location_id'] = 'custom'
+            
             if 'user_id' in session:
                 execute_db("UPDATE users SET latitude = ?, longitude = ? WHERE user_id = ?",
                            (session['user_lat'], session['user_lng'], session['user_id']))
-            return jsonify({'status': 'success', 'lat': session['user_lat'], 'lng': session['user_lng']})
+            return jsonify({
+                'status': 'success',
+                'lat': session['user_lat'],
+                'lng': session['user_lng'],
+                'name': resolved_name,
+                'radius': Config.DEFAULT_RADIUS_KM
+            })
         except ValueError:
             pass
     return jsonify({'status': 'error', 'message': 'Invalid coordinates'}), 400
+
+@api_bp.route('/geocode')
+def geocode_location():
+    """Geocode any city, village, town, or pincode in India with fallback to online search."""
+    q = request.args.get('q', '').strip().lower()
+    if not q:
+        return jsonify({'status': 'error', 'message': 'Query cannot be empty', 'results': []})
+
+    results = []
+
+    # 1. First check local knowledge base (instant response)
+    for loc in LOCATION_KNOWLEDGE_BASE:
+        if (q in loc['name'].lower() or
+            q in loc['telugu_name'].lower() or
+            q in loc['pincode'] or
+            q in loc['district'].lower()):
+            results.append({
+                'name': loc['name'],
+                'display_name': f"{loc['name']} ({loc['telugu_name']}), {loc['district']} Dist - PIN {loc['pincode']}",
+                'lat': loc['lat'],
+                'lng': loc['lng'],
+                'pincode': loc['pincode'],
+                'source': 'local_kb'
+            })
+
+    # 2. If no local match, attempt OpenStreetMap Nominatim with safe timeout
+    if not results and len(q) >= 3:
+        try:
+            encoded_q = urllib.parse.quote(f"{q}, India")
+            nominatim_url = f"https://nominatim.openstreetmap.org/search?q={encoded_q}&format=json&countrycodes=in&limit=4"
+            req = urllib.request.Request(
+                nominatim_url,
+                headers={'User-Agent': 'SevaSetu-Rural-Hyperlocal-App/2.0 (sevasetu@community.org)'}
+            )
+            with urllib.request.urlopen(req, timeout=2.5) as response:
+                data = json.loads(response.read().decode('utf-8'))
+                for item in data:
+                    results.append({
+                        'name': item.get('display_name', '').split(',')[0],
+                        'display_name': item.get('display_name'),
+                        'lat': float(item.get('lat')),
+                        'lng': float(item.get('lon')),
+                        'pincode': '',
+                        'source': 'osm'
+                    })
+        except Exception:
+            # Fallback gracefully
+            pass
+
+    # Fallback to default if absolutely no match
+    if not results:
+        results.append({
+            'name': Config.LOCATION_NAME,
+            'display_name': f"{Config.LOCATION_NAME} Hub, Krishna District - PIN {Config.PINCODE}",
+            'lat': Config.DEFAULT_LAT,
+            'lng': Config.DEFAULT_LNG,
+            'pincode': Config.PINCODE,
+            'source': 'fallback'
+        })
+
+    return jsonify({'status': 'success', 'query': q, 'results': results})
 
 @api_bp.route('/assistant', methods=['POST'])
 def smart_assistant():
@@ -130,7 +244,7 @@ def smart_assistant():
 def nearby_providers():
     lat = float(request.args.get('lat', session.get('user_lat', Config.DEFAULT_LAT)))
     lng = float(request.args.get('lng', session.get('user_lng', Config.DEFAULT_LNG)))
-    radius = float(request.args.get('radius', 15.0))
+    radius = float(request.args.get('radius', Config.DEFAULT_RADIUS_KM))
     category = request.args.get('category', '')
     available_only = request.args.get('available_now', '') == '1'
 
@@ -165,7 +279,7 @@ def nearby_providers():
 def nearby_mentors():
     lat = float(request.args.get('lat', session.get('user_lat', Config.DEFAULT_LAT)))
     lng = float(request.args.get('lng', session.get('user_lng', Config.DEFAULT_LNG)))
-    radius = float(request.args.get('radius', 25.0))
+    radius = float(request.args.get('radius', Config.DEFAULT_RADIUS_KM))
 
     query = """
         SELECT mp.*, u.name, u.phone, p.category, p.latitude, p.longitude, p.address,
@@ -184,7 +298,7 @@ def nearby_mentors():
 def nearby_pharmacies():
     lat = float(request.args.get('lat', session.get('user_lat', Config.DEFAULT_LAT)))
     lng = float(request.args.get('lng', session.get('user_lng', Config.DEFAULT_LNG)))
-    radius = float(request.args.get('radius', 15.0))
+    radius = float(request.args.get('radius', Config.DEFAULT_RADIUS_KM))
 
     query = """
         SELECT ph.*, haversine(?, ?, ph.latitude, ph.longitude) as distance

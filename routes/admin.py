@@ -80,15 +80,29 @@ def dashboard():
 @role_required(['admin'])
 def update_provider_status(provider_id):
     status = request.form.get('status')
+    rejection_reason = request.form.get('rejection_reason', '').strip()
+    
     if status in ['Verified', 'Pending', 'Rejected', 'Suspended']:
-        execute_db("UPDATE providers SET verification_status = ? WHERE provider_id = ?", (status, provider_id))
+        if status == 'Rejected':
+            execute_db("UPDATE providers SET verification_status = ?, rejection_reason = ? WHERE provider_id = ?",
+                       (status, rejection_reason or 'Trade or ID verification requirements not met.', provider_id))
+        else:
+            execute_db("UPDATE providers SET verification_status = ?, rejection_reason = NULL WHERE provider_id = ?",
+                       (status, provider_id))
         
-        provider = query_db("SELECT user_id FROM providers WHERE provider_id = ?", (provider_id,), one=True)
+        provider = query_db("SELECT user_id, category FROM providers WHERE provider_id = ?", (provider_id,), one=True)
         if provider:
+            if status == 'Verified':
+                msg = f"Congratulations! Your {provider['category']} profile has been verified & approved by the Administrator. Your listing is now active across a 30 km radius."
+            elif status == 'Rejected':
+                msg = f"Your service provider registration was reviewed and rejected. Reason: {rejection_reason or 'Documents could not be verified'}"
+            else:
+                msg = f"Your provider account status has been updated to: {status} by the platform administrator."
+
             execute_db("""
                 INSERT INTO notifications (user_id, title, message)
                 VALUES (?, 'Provider Account Status Update', ?)
-            """, (provider['user_id'], f"Your provider account status has been updated to: {status} by the platform administrator."))
+            """, (provider['user_id'], msg))
 
         flash(f'Provider verification status changed to {status}.', 'success')
     return redirect(url_for('admin.dashboard'))
